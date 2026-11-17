@@ -1,159 +1,26 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ASTRAVION - Legends of Eternal War</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07152f">
+<title>ASTRAVION — Legends of Eternal War</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#071329;color:#fff;font-family:Arial}
-header{padding:15px;background:#0d1d3b;border-bottom:2px solid #d9b45e;color:#e9c66f;font:bold 22px Georgia;letter-spacing:3px}
-header small{display:block;font:9px Arial;color:#b8c6dc;letter-spacing:1px}
-nav{display:flex;gap:6px;overflow:auto;padding:10px;background:#0b1932}
-button{border:1px solid #526b92;border-radius:7px;padding:9px 12px;background:#1b3155;color:white;cursor:pointer}
-button.active{background:#e1b85f;color:#171a2b}
-main{padding:12px;max-width:1300px;margin:auto}
-.panel{background:#111f3b;border:1px solid #354c70;border-radius:12px;padding:12px;margin-bottom:12px}
-h2{color:#e9c66f;font-family:Georgia}
-.layout{display:grid;grid-template-columns:155px minmax(180px,1fr) 270px;gap:10px}
-.roster,.details{background:#09162e;border:1px solid #354c70;border-radius:9px;padding:9px}
-.list{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.pick{padding:4px;background:#1a2b49;text-align:left;min-width:0}
-.pick.active{border:2px solid #e9c66f}
-.pick svg{width:100%;height:65px;display:block}
-.pick b{font-size:11px}
-.pick small{display:block;font-size:9px;color:#bdc9dd}
-.art{min-height:480px;position:relative;overflow:hidden;border:1px solid #79633d;border-radius:10px;background:radial-gradient(circle at 50% 40%,var(--glow),#101a35 60%,#050b1b);display:flex;align-items:center;justify-content:center}
-.art svg{width:95%;max-height:440px;filter:drop-shadow(0 15px 15px #000)}
-.caption{position:absolute;bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent,#050b1b)}
-.caption h1{color:#f2cf78;margin:0;font:30px Georgia}
-.role{display:inline-block;border:1px solid #c8a85e;border-radius:20px;padding:5px 9px;color:#e8ca7e;font-size:11px}
-.stat{font-size:11px;margin:12px 0;color:#cbd6e9}
-.bar{height:7px;background:#293b5b;border-radius:8px;margin-top:5px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#bd883f,#f7d987)}
-.skills,.skins{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:9px 0}
-.skill,.skin{padding:7px 3px;text-align:center;background:#1b2d4c;border:1px solid #435779;border-radius:7px;font-size:10px}
-.skill b{display:block;font-size:20px}
-.skin{cursor:pointer;color:white}
-.skin.active{border:2px solid #e9c66f}
-.skin-art{height:45px;display:grid;place-items:center;font-size:27px;background:radial-gradient(circle,var(--skin),#101a32);border-radius:5px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.actions button:last-child{grid-column:span 2}
-.notice{margin-top:10px;padding:10px;background:#09152b;border:1px solid #344a6c;border-radius:7px;font-size:12px;color:#cbd5e5}
-.view{display:none}.view.active{display:block}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
-.card{background:#0b1830;border:1px solid #344a6c;border-radius:9px;padding:10px}
-.card svg{width:100%;height:120px}
-.card h3{color:#e9c66f}
-@media(max-width:760px){.layout{grid-template-columns:112px minmax(0,1fr)}.details{grid-column:1/-1}.art{min-height:340px}.art svg{max-height:320px}.roster{grid-row:span 2}.caption h1{font-size:23px}}
+:root{--gold:#e8c36b;--blue:#102951;--line:#35547d}*{box-sizing:border-box}body{margin:0;background:#06132b;color:#f3f5fb;font-family:Georgia,serif}button,input{font:inherit}button{cursor:pointer;border:1px solid #526f9b;border-radius:7px;background:linear-gradient(#21477d,#10264b);color:#fff;padding:9px 12px}button.active,.gold{background:linear-gradient(#ffe08b,#c28a32);color:#20172a;border-color:#ffdf86;font-weight:bold}header{height:72px;padding:8px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#06132c,#123b73,#07152d);border-bottom:2px solid #c69a4a}.logo{font:bold 27px Georgia;letter-spacing:3px;color:var(--gold)}.logo small{display:block;font:9px Arial;letter-spacing:1px;color:#d1d9e8}.wallet{margin-left:auto;color:var(--gold);font:14px Arial}.auth{max-width:400px;margin:60px auto;padding:24px;background:#10203d;border:1px solid var(--line);border-radius:12px}.auth input{display:block;width:100%;padding:12px;margin:9px 0;background:#07152d;color:white;border:1px solid var(--line);border-radius:7px}.auth button{margin-right:5px}#game[hidden],#loginPanel[hidden]{display:none}nav{display:flex;gap:7px;overflow-x:auto;padding:10px;background:#091b37;border-bottom:1px solid var(--line)}nav button{white-space:nowrap}main{max-width:1500px;margin:auto;padding:12px}.player{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;background:#10203d;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;font:12px Arial}.page[hidden]{display:none}.panel{background:linear-gradient(135deg,#142849,#091832);border:1px solid #405a7e;border-radius:12px;padding:12px;margin-bottom:12px}h2{color:var(--gold);margin:2px 0 12px}.hero-layout{display:grid;grid-template-columns:205px minmax(260px,1fr) 310px;gap:10px}.roster,.details{background:#08162e;border:1px solid var(--line);border-radius:9px;padding:10px;min-width:0}.roster-list{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:650px;overflow:auto}.hero-card{padding:4px;min-width:0;text-align:left;background:#142847}.hero-card img{width:100%;height:85px;object-fit:cover;border-radius:5px;display:block}.hero-card b{display:block;font-size:12px;margin-top:4px}.hero-card small{font:9px Arial;color:#b9c8dd}.hero-card.chosen,.skin-card.chosen{border:2px solid var(--gold);box-shadow:0 0 12px #dca84d}.showcase{position:relative;min-height:550px;overflow:hidden;border:1px solid #8b6b3d;border-radius:10px;background:radial-gradient(circle at 50% 30%,#6e1d36,#101d3c 62%,#071126);display:flex;align-items:center;justify-content:center}.showcase:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,#ffffff08,transparent)}.showcase img{height:100%;max-height:610px;width:100%;object-fit:contain;position:absolute;inset:0;filter:drop-shadow(0 15px 20px #000)}.hero-caption{position:absolute;z-index:2;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,#050b1c)}.hero-caption h1{font-size:36px;color:var(--gold);margin:0}.hero-caption p{margin:4px 0}.details h2{font-size:25px;margin-bottom:3px}.desc{font:13px/1.5 Arial;color:#d4deed;min-height:54px}.role{display:inline-block;border:1px solid #b89553;border-radius:20px;padding:5px 9px;color:#f2d38b;font:11px Arial}.stat{font:11px Arial;margin:12px 0;color:#d6deed}.stat b{float:right;color:#f1d38d}.bar{height:7px;background:#283d60;border-radius:8px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#b98035,#ffe18b)}.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.skill{padding:7px 2px;text-align:center;background:#172d50;border:1px solid #3d5a81;border-radius:7px}.skill b{display:block;font-size:20px}.skill small{font:9px Arial}.skins{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 0}.skin-card{padding:4px;background:#142847;min-width:0;font-size:10px}.skin-card img{width:100%;height:70px;object-fit:cover;display:block;border-radius:4px}.skin-card span{display:block;padding:4px 0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.actions button:last-child{grid-column:span 2}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.tabs button{background:#15345e}.notice{font:12px Arial;color:#cbd7e8;padding:10px;background:#08162d;border:1px solid var(--line);border-radius:7px;margin-top:9px}.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.skin-tile{background:#0a1932;border:1px solid var(--line);border-radius:8px;padding:8px}.skin-tile img{width:100%;height:220px;object-fit:cover;border-radius:6px}.skin-tile h3{color:var(--gold);font-size:16px}.skin-tile p{font:11px Arial;color:#bdc9dc}.room input{padding:10px;background:#07152d;color:#fff;border:1px solid var(--line);border-radius:7px}.quote{color:var(--gold);font-style:italic}@media(max-width:900px){.hero-layout{grid-template-columns:150px minmax(200px,1fr)}.details{grid-column:1/-1}.showcase{min-height:440px}.roster{grid-row:span 2}}@media(max-width:520px){header{height:60px;padding:7px 10px}.logo{font-size:19px}.wallet{font-size:11px}main{padding:7px}.hero-layout{grid-template-columns:112px minmax(0,1fr);gap:6px}.roster,.details{padding:7px}.showcase{min-height:340px}.showcase img{object-fit:contain}.hero-caption h1{font-size:25px}.hero-card img{height:60px}.hero-card b{font-size:10px}.hero-card small{font-size:8px}.details{grid-column:1/-1}.skin-card img{height:62px}}
 </style>
 </head>
 <body>
-<header>ASTRAVION<small>LEGENDS OF ETERNAL WAR · DEVELOPED BY SUHENDRA</small></header>
-<nav>
-<button class="active" data-page="heroes">Heroes</button>
-<button data-page="skins">Skins</button>
-<button data-page="shop">Shop</button>
-<button data-page="story">Story</button>
-<button data-page="rank">Rank</button>
-</nav>
-<main>
-<section class="view active" id="heroes">
-<div class="panel">
-<h2>HERO COLLECTION</h2>
-<div class="layout">
-<aside class="roster">
-<h3>DAFTAR HERO</h3>
-<div class="list" id="heroList"></div>
-</aside>
-<div class="art" id="mainArt">
-<div id="bigHero"></div>
-<div class="caption"><h1 id="heroName"></h1><p id="heroTitle"></p></div>
-</div>
-<aside class="details">
-<h2 id="detailName"></h2>
-<p id="description"></p>
-<span class="role" id="role"></span>
-<div id="stats"></div>
-<h3>KEMAMPUAN</h3>
-<div class="skills" id="skills"></div>
-<h3>SKIN HERO</h3>
-<div class="skins" id="skinList"></div>
-<div class="actions">
-<button onclick="message('Fitur pembelian segera hadir')">Beli Hero</button>
-<button onclick="message('Preview hero '+current.name)">Preview</button>
-<button onclick="message('Mode latihan segera hadir')">Coba Hero</button>
-</div>
-</aside>
-</div>
-<div class="notice" id="info">Pilih hero untuk melihat detail.</div>
-</div>
-</section>
-<section class="view" id="skins">
-<div class="panel"><h2>SKIN COLLECTION</h2><div class="cards" id="allSkins"></div></div>
-</section>
-<section class="view" id="shop">
-<div class="panel"><h2>ASTRAVION SHOP</h2><p>Tempat pembelian hero dan skin akan segera hadir.</p></div>
-</section>
-<section class="view" id="story">
-<div class="panel"><h2>STORY</h2><p>Di dunia ASTRAVION, sepuluh legenda bertarung untuk menguasai kekuatan abadi.</p></div>
-</section>
-<section class="view" id="rank">
-<div class="panel"><h2>RANK</h2><h1>WARRIOR III</h1><p>Mode Ranked segera hadir.</p></div>
-</section>
-</main>
-<script>
-const heroes=[
-{name:"KAEL",title:"The Crimson Sovereign",role:"Fighter / Assassin",desc:"Ksatria bara merah dengan pedang iblis dan zirah perang crimson.",color:"#a51f35",skin:["Crimson Sovereign","Shadow Reaper","Dragon Emperor"],skinColor:["#a51f35","#56306e","#bd762c"],symbol:"sword",skills:["🔥","🩸","⚔️","☄️"],stats:[78,96,82,74],price:1600},
-{name:"AURELIA",title:"Starlight Oracle",role:"Mage / Support",desc:"Penyihir bintang yang mengendalikan cahaya kosmik dan sihir suci.",color:"#8664d8",skin:["Starlight Oracle","Crystal Empress","Dawn Goddess"],skinColor:["#8664d8","#54a9d5","#d8a34b"],symbol:"star",skills:["✨","🌟","🔮","🌌"],stats:[52,82,98,80],price:1500},
-{name:"DARIUS",title:"Frostbound Exile",role:"Tank / Fighter",desc:"Kesatria utara dengan zirah es, perisai besar, dan kapak badai.",color:"#318fc5",skin:["Glacier Knight","Frozen Warlord","Obsidian Ice"],skinColor:["#318fc5","#8ed8ed","#4a5a91"],symbol:"shield",skills:["❄️","🧊","🛡️","🌨️"],stats:[98,75,78,58],price:1400},
-{name:"LUNARA",title:"Azure Moonblade",role:"Assassin",desc:"Pendekar bulan dengan dua bilah cahaya dan gerakan secepat bayangan.",color:"#5157bd",skin:["Moonblade","Eclipse Phantom","Silver Lotus"],skinColor:["#5157bd","#38234d","#a8c9e8"],symbol:"moon",skills:["🌙","🗡️","🌌","🌑"],stats:[58,94,86,84],price:1550},
-{name:"RAVEN",title:"Shadow Veil",role:"Assassin / Marksman",desc:"Pemburu bayangan dengan jubah hitam, busur senyap, dan panah racun.",color:"#60416f",skin:["Night Stalker","Venom Crow","Blood Moon Raven"],skinColor:["#60416f","#557849","#9f304e"],symbol:"bow",skills:["🪶","🏹","☠️","🌫️"],stats:[55,97,78,90],price:1450},
-{name:"ZEPHYR",title:"Windborn Prince",role:"Marksman",desc:"Pemanah badai yang mengendalikan angin dan panah berkecepatan tinggi.",color:"#3b9990",skin:["Tempest Ranger","Sky Admiral","Emerald Gale"],skinColor:["#3b9990","#668dc1","#52a66d"],symbol:"bow",skills:["🌬️","🏹","🍃","🌪️"],stats:[53,91,80,69],price:1350},
-{name:"SELENE",title:"Roselight Siren",role:"Mage / Support",desc:"Penyihir bunga yang mengubah kelopak menjadi ilusi dan cahaya.",color:"#bd599d",skin:["Roselight Siren","Midnight Orchid","Aurora Blossom"],skinColor:["#bd599d","#76509f","#e6a8cb"],symbol:"staff",skills:["🌸","💗","✨","🌺"],stats:[50,88,96,76],price:1500},
-{name:"ORION",title:"Celestial Warden",role:"Tank / Support",desc:"Penjaga rasi bintang dengan zirah langit dan perisai pelindung.",color:"#427eae",skin:["Star Sentinel","Void Guardian","Solar Paladin"],skinColor:["#427eae","#604c9b","#c79a42"],symbol:"shield",skills:["⭐","🛡️","🌠","🌌"],stats:[96,68,88,62],price:1400},
-{name:"VALKYRIE",title:"Dawnwing Champion",role:"Fighter / Support",desc:"Prajurit fajar bersayap emas yang memimpin serangan dari langit.",color:"#c08b3e",skin:["Dawnwing Champion","Frost Valkyrie","Phoenix Empress"],skinColor:["#c08b3e","#82c5d9","#b94b30"],symbol:"wing",skills:["🪽","⚔️","☀️","🌅"],stats:[84,88,91,72],price:1600},
-{name:"RIZKY",title:"Eternal Challenger",role:"Fighter",desc:"Petarung arena dengan zirah futuristik dan sarung tangan energi.",color:"#637b9c",skin:["Arena Challenger","Neon Striker","Cyber Ronin"],skinColor:["#637b9c","#397bba","#a24c75"],symbol:"fist",skills:["🥊","⚡","🛡️","💥"],stats:[76,85,72,55],price:1200}
-];
-
-let current=heroes[0],skinIndex=0;
-function message(t){document.getElementById("info").textContent=t}
-function drawing(h,variant=0){
-let c=h.skinColor[variant],shape="";
-if(h.symbol==="sword")shape='<path d="M180 65 L230 210 L210 250 L190 210 Z" fill="#d9dce8" stroke="#6e2634" stroke-width="7"/><path d="M190 200 L240 240 L220 255 L175 220" fill="#c99d52"/>';
-if(h.symbol==="star")shape='<path d="M200 45 L230 145 L330 150 L250 215 L280 315 L200 255 L120 315 L150 215 L70 150 L170 145 Z" fill="#ffe29a" stroke="#8a67cf" stroke-width="10"/>';
-if(h.symbol==="shield")shape='<path d="M200 55 L310 100 L290 235 Q250 310 200 340 Q150 310 110 235 L90 100 Z" fill="#c5eaff" stroke="#4d7da9" stroke-width="13"/><path d="M200 85 V300" stroke="#5286aa" stroke-width="12"/>';
-if(h.symbol==="moon")shape='<path d="M250 60 A130 130 0 1 0 310 290 A105 105 0 0 1 250 60" fill="#e6e9ff" stroke="#7585d5" stroke-width="9"/><path d="M120 280 L280 120" stroke="#d5e4ff" stroke-width="12"/>';
-if(h.symbol==="bow")shape='<path d="M120 70 Q340 200 120 330" fill="none" stroke="#b98b57" stroke-width="17"/><path d="M120 70 L120 330 M120 200 L315 200" stroke="#e8e9ef" stroke-width="5"/><path d="M315 200 L280 180 L280 220 Z" fill="#d5d8e5"/>';
-if(h.symbol==="staff")shape='<path d="M200 70 L200 335" stroke="#bd9862" stroke-width="18"/><circle cx="200" cy="80" r="60" fill="#f4b6e0" stroke="#ffe8fa" stroke-width="12"/><path d="M200 35 L215 65 L250 80 L215 95 L200 125 L185 95 L150 80 L185 65 Z" fill="#fff1b9"/>';
-if(h.symbol==="wing")shape='<path d="M190 200 Q20 30 65 280 Q125 255 190 220 Q275 30 340 90 Q320 200 210 240" fill="#f5e1ae" stroke="#a97b3e" stroke-width="10"/><path d="M190 210 L200 340" stroke="#d9b15f" stroke-width="15"/>';
-if(h.symbol==="fist")shape='<path d="M125 150 Q100 100 135 80 Q160 60 180 105 L185 55 Q215 35 225 90 L245 55 Q275 55 270 110 L295 90 Q330 110 300 175 L280 260 L145 260 Q110 220 125 150" fill="#aebdd0" stroke="#425c80" stroke-width="13"/><path d="M145 190 H280" stroke="#edc66c" stroke-width="15"/>';
-return `<svg viewBox="0 0 400 400" role="img" aria-label="${h.name}"><defs><linearGradient id="armor" x2="1" y2="1"><stop stop-color="${c}"/><stop offset="1" stop-color="#11172b"/></linearGradient></defs><path d="M200 28 L240 60 L270 110 L315 145 L285 185 L265 330 L135 330 L115 185 L85 145 L130 110 L160 60 Z" fill="url(#armor)" stroke="${c}" stroke-width="9"/><path d="M145 120 L200 95 L255 120 L235 220 L200 265 L165 220 Z" fill="#202b43" stroke="${c}" stroke-width="8"/><circle cx="200" cy="125" r="48" fill="#c9a17d" stroke="#e9d3ae" stroke-width="7"/><path d="M150 120 Q145 55 205 55 Q260 55 250 125 L230 100 L175 100 Z" fill="#182035" stroke="${c}" stroke-width="9"/><path d="M165 130 H185 M215 130 H235" stroke="#fff1bc" stroke-width="8"/><path d="M160 185 L95 250 L130 270 L185 220 M240 185 L305 250 L270 270 L215 220" fill="none" stroke="${c}" stroke-width="24" stroke-linecap="round"/>${shape}<path d="M155 330 L130 385 M245 330 L270 385" stroke="#c0c9d8" stroke-width="22"/><path d="M145 345 L115 385 M255 345 L285 385" stroke="${c}" stroke-width="16"/></svg>`;
-}
-function render(){
-document.getElementById("heroList").innerHTML=heroes.map(h=>`<button class="pick ${h===current?"active":""}" data-id="${h.name}">${drawing(h)}<b>${h.name}</b><small>${h.role}</small></button>`).join("");
-document.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{current=heroes.find(h=>h.name===b.dataset.id);skinIndex=0;render()});
-let h=current;
-document.getElementById("heroName").textContent=h.name;
-document.getElementById("heroTitle").textContent=h.title;
-document.getElementById("detailName").textContent=h.name;
-document.getElementById("description").textContent=h.desc;
-document.getElementById("role").textContent=h.role;
-document.getElementById("mainArt").style.setProperty("--glow",h.skinColor[skinIndex]);
-document.getElementById("bigHero").innerHTML=drawing(h,skinIndex);
-document.getElementById("stats").innerHTML=["Durability","Offense","Skill Effects","Difficulty"].map((n,i)=>`<div class="stat">${n}<span style="float:right">${h.stats[i]}%</span><div class="bar"><i style="width:${h.stats[i]}%"></i></div></div>`).join("");
-document.getElementById("skills").innerHTML=h.skills.map((s,i)=>`<div class="skill"><b>${s}</b>${["Passive","Skill 1","Skill 2","Ultimate"][i]}</div>`).join("");
-document.getElementById("skinList").innerHTML=h.skin.map((s,i)=>`<button class="skin ${i===skinIndex?"active":""}" data-skin="${i}"><div class="skin-art" style="--skin:${h.skinColor[i]}">${["✦","⚔","♛"][i]}</div>${s}</button>`).join("");
-document.querySelectorAll("[data-skin]").forEach(b=>b.onclick=()=>{skinIndex=+b.dataset.skin;render()});
-message(h.name+" — "+h.title+". Skin aktif: "+h.skin[skinIndex]);
-document.getElementById("allSkins").innerHTML=heroes.flatMap(x=>x.skin.map((s,i)=>`<article class="card">${drawing(x,i)}<h3>${s}</h3><p>${x.name} · Skin ${i+1}</p><button onclick="current=heroes.find(h=>h.name==='${x.name}');skinIndex=${i};document.querySelector('[data-page=heroes]').click()">Lihat Skin</button></article>`)).join("");
-}
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{
-document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x===b));
-document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===b.dataset.page));
-});
-render();
-</script>
-</body>
-</html>
+<header><div class="logo">ASTRAVION<small>LEGENDS OF ETERNAL WAR · DEVELOPED BY SUHENDRA</small></div><div class="wallet">🪙 <span id="coinCount">32.000</span>　💎 <span id="diamondCount">599</span></div></header>
+<section class="auth" id="loginPanel"><h2>Masuk ASTRAVION</h2><p>Gunakan akun Firebase ASTRAVION kamu.</p><input id="email" type="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button id="login" class="gold">Masuk</button><button id="register">Daftar</button><p id="authMessage" class="notice">Login diperlukan untuk masuk ke lobby.</p></section>
+<div id="game" hidden>
+<nav><button data-page="homePage">Beranda</button><button data-page="heroPage" class="active">Hero</button><button data-page="skinPage">Skin</button><button data-page="shopPage">Toko</button><button data-page="missionPage">Misi</button><button data-page="rankPage">Rank</button><button data-page="friendPage">Teman</button><button data-page="roomPage">Custom Room</button><button id="logout">Keluar</button></nav>
+<main><div class="player"><div><b id="playerName">Pemain</b><br><span id="playerEmail">ID pemain</span></div><b>LEVEL 1 · WARRIOR III</b></div>
+<section class="page" id="homePage"><div class="panel"><h2>LEGENDS OF ETERNAL WAR</h2><h1>Bangkitkan legenda. Kuasai arena.</h1><p>Pilih hero andalanmu dan bersiaplah memasuki pertempuran.</p><button class="gold" data-page="heroPage">Pilih Hero</button></div></section>
+<section class="page" id="heroPage"><div class="panel"><h2>HERO COLLECTION</h2><div class="hero-layout"><aside class="roster"><h3>DAFTAR HERO</h3><div class="roster-list" id="heroList"></div></aside><div class="showcase"><img id="heroArtwork" alt="Artwork hero"><div class="hero-caption"><h1 id="heroName">Kael</h1><p id="heroTitle">The Crimson Sovereign</p></div></div><aside class="details"><h2 id="detailName">Kael</h2><p class="desc" id="detailDesc"></p><span class="role" id="heroRole"></span><div id="stats"></div><h3 style="color:var(--gold)">KEMAMPUAN</h3><div class="skills" id="skills"></div><h3 style="color:var(--gold)">SKIN HERO</h3><div class="skins" id="skins"></div><p class="quote" id="heroQuote"></p><p style="color:var(--gold)" id="heroPrice"></p><div class="actions"><button id="buyHero" class="gold">Beli Hero</button><button id="previewHero">Preview</button><button id="tryHero">Coba Hero</button></div></aside></div><div class="tabs"><button>Info</button><button>Build</button><button>Guide</button><button>Equipment</button></div><div id="message" class="notice">Pilih hero untuk melihat detail.</div></div></section>
+<section class="page" id="skinPage" hidden><div class="panel"><h2>SKIN COLLECTION</h2><div class="tiles" id="allSkins"></div></div></section>
+<section class="page" id="shopPage" hidden><div class="panel"><h2>ASTRAVION SHOP</h2><p>Daftar hero tersedia di menu Hero. Pembelian saat ini disimpan di browser perangkat ini.</p></div></section>
+<section class="page" id="missionPage" hidden><div class="panel"><h2>MISI</h2><p>Misi harian dan hadiah akan dikembangkan.</p></div></section>
+<section class="page" id="rankPage" hidden><div class="panel"><h2>RANK</h2><h1>Warrior III</h1><p>Mode Ranked akan dikembangkan.</p></div></section>
+<section class="page" id="friendPage" hidden><div class="panel"><h2>TEMAN</h2><p>Fitur pencarian dan chat teman akan dikembangkan.</p></div></section>
+<section class="page room" id="roomPage" hidden><div class="panel"><h2>CUSTOM ROOM 5 VS 5</h2><input id="roomName" placeholder="Nama room"><button id="roomCreate">Buat Room</button><div id="roomCode" class="notice">Belum ada room.</div></div></section>
+</main></div>
+<script type="module" src="./app.js"></script>
+</body></html>
