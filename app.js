@@ -127,70 +127,134 @@ onAuthStateChanged(auth,user=>{ $('loginPanel').hidden=!!user; $('game').hidden=
 render();
 
 
-// ===== ASTRAVION ARENA TRAINING MODE =====
+
+// ===== ASTRAVION 3D MOBA ARENA (Three.js) =====
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
 const arena = {
- canvas: $('battleCanvas'), ctx: $('battleCanvas').getContext('2d'),
- running:false, raf:0, last:0, keys:{}, joy:{x:0,y:0,active:false},
- player:{x:230,y:280,hp:100,max:100,dir:0,attack:0,flash:0},
- bot:{x:670,y:270,hp:100,max:100,attack:0,flash:0},
- effects:[], cooldown:{s1:0,s2:0,ult:0,attack:0}, music:null, musicTimer:null, imgCache:{}
+  running:false, raf:0, last:0, keys:{}, joy:{x:0,y:0,active:false},
+  player:{x:-5,z:0,hp:100,max:100,dir:0,flash:0,attackTime:0,walk:0},
+  bot:{x:5,z:0,hp:100,max:100,flash:0,attackTime:0,walk:0},
+  cooldown:{s1:0,s2:0,ult:0,attack:0}, effects:[], music:null,
+  scene:null,camera:null,renderer:null,hero:null,enemy:null,clock:new THREE.Clock(),
+  effectMeshes:[], resizeObserver:null
 };
-function arenaSay(t){ if($('arenaMessage')) $('arenaMessage').textContent=t; }
-function selectedArtwork(){ return ART[selected] ? ART[selected][selectedSkin] : ART.kael[0]; }
-function startArena(){
- if(!arena.canvas) return;
- $('arenaPage').hidden=false;
- document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='arenaPage');
- document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page==='arenaPage'));
- arena.running=true; arena.last=0;
- if(arena.raf) cancelAnimationFrame(arena.raf);
- arenaSay('Pertarungan dimulai! Gerakkan hero dan kalahkan bot.');
- drawArena(); updateHud();
- arena.raf=requestAnimationFrame(arenaLoop);
+function arenaSay(t){ const el=$('arenaMessage'); if(el) el.textContent=t; }
+function makeMat(color,roughness=.72,metalness=.05){return new THREE.MeshStandardMaterial({color,roughness,metalness});}
+function addBox(parent,w,h,d,mat,x=0,y=0,z=0){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
 }
-function stopArena(){arena.running=false;if(arena.raf)cancelAnimationFrame(arena.raf);}
-function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
-function drawArena(){
- const c=arena.ctx, w=arena.canvas.width,h=arena.canvas.height,p=arena.player,b=arena.bot;
- c.clearRect(0,0,w,h);
- // battlefield grass, stone paths and lanes
- c.fillStyle='#183d35';c.fillRect(0,0,w,h);
- for(let i=0;i<16;i++){for(let j=0;j<10;j++){c.fillStyle=(i+j)%2?'#1b493a':'#204d3b';c.fillRect(i*60,j*60,60,60)}}
- c.fillStyle='#8a7956';c.fillRect(0,230,w,82);c.fillRect(410,0,78,h);
- c.strokeStyle='#c4aa75';c.lineWidth=3;c.setLineDash([14,12]);c.strokeRect(8,8,w-16,h-16);c.setLineDash([]);
- // bushes and stones
- for(const [x,y] of [[90,90],[170,440],[740,100],[790,430],[390,115],[520,420]]){
-  c.fillStyle='#102c27';c.beginPath();c.arc(x,y,27,0,Math.PI*2);c.fill();
-  c.fillStyle='#34714b';c.beginPath();c.arc(x-8,y-7,17,0,Math.PI*2);c.fill();
- }
- // towers
- for(const [x,y,col] of [[70,270,'#4aa6df'],[830,270,'#e65c65']]){
-  c.fillStyle='#26374d';c.beginPath();c.arc(x,y,26,0,Math.PI*2);c.fill();
-  c.fillStyle=col;c.beginPath();c.arc(x,y,14,0,Math.PI*2);c.fill();
-  c.fillStyle='#fff';c.fillRect(x-3,y-35,6,18);
- }
- function drawFighter(unit,src,isEnemy){
-  let img=arena.imgCache[src];
-  if(!img){img=new Image();img.src=src;arena.imgCache[src]=img;}
-  c.save();
-  if(unit.flash>0){c.globalAlpha=.55+Math.random()*.45;}
-  c.fillStyle='#0008';c.beginPath();c.ellipse(unit.x,unit.y+29,27,9,0,0,Math.PI*2);c.fill();
-  if(img.complete&&img.naturalWidth){c.drawImage(img,unit.x-34,unit.y-65,68,96);}
-  else{c.fillStyle=isEnemy?'#a83245':'#d2a34f';c.beginPath();c.arc(unit.x,unit.y-12,23,0,Math.PI*2);c.fill();}
-  c.restore();
-  c.fillStyle='#111';c.fillRect(unit.x-32,unit.y-78,64,7);
-  c.fillStyle=isEnemy?'#e4545c':'#57d68a';c.fillRect(unit.x-32,unit.y-78,64*Math.max(0,unit.hp/unit.max),7);
-  c.fillStyle='#fff';c.font='bold 12px Arial';c.textAlign='center';c.fillText(isEnemy?'BOT MUSUH':current().name,unit.x,unit.y-86);
- }
- drawFighter(p,selectedArtwork(),false);
- drawFighter(b,ART.darius[0],true);
- // effects
- for(const e of arena.effects){
-  c.save();c.globalAlpha=Math.max(0,e.life/30);
-  c.strokeStyle=e.color;c.lineWidth=e.width||7;c.beginPath();c.arc(e.x,e.y,e.r*(1.1-e.life/30),0,Math.PI*2);c.stroke();
-  c.restore();
- }
- c.fillStyle='#fff';c.font='13px Arial';c.textAlign='left';c.fillText('ARENA TRAINING · ASTRAVION',18,30);
+function addSphere(parent,r,mat,x=0,y=0,z=0){
+ const m=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
+}
+function makeFighter(mainColor,trimColor,isEnemy=false){
+ const root=new THREE.Group();
+ const armor=makeMat(mainColor,.48,.25), trim=makeMat(trimColor,.35,.55), skin=makeMat(isEnemy?0xc78c70:0xe0b58d), dark=makeMat(0x202838);
+ const torso=new THREE.Group();torso.position.y=1.12;root.add(torso);
+ const chest=addBox(torso,.72,.78,.42,armor,0,0,0);
+ addBox(torso,.76,.13,.46,trim,0,.29,0);
+ addBox(torso,.42,.16,.46,dark,0,-.39,0);
+ addSphere(torso,.22,skin,0,.57,0);
+ const helmet= new THREE.Mesh(new THREE.ConeGeometry(.25,.34,6),trim);helmet.position.set(0,.83,0);helmet.castShadow=true;torso.add(helmet);
+ addBox(torso,.48,.12,.5,trim,0,.53,.02);
+ const leftArm=new THREE.Group();leftArm.position.set(-.48,.34,0);torso.add(leftArm);
+ addBox(leftArm,.23,.52,.24,armor,0,-.16,0);
+ addSphere(leftArm,.15,trim,0,-.43,0);
+ const rightArm=new THREE.Group();rightArm.position.set(.48,.34,0);torso.add(rightArm);
+ addBox(rightArm,.23,.52,.24,armor,0,-.16,0);
+ addSphere(rightArm,.15,trim,0,-.43,0);
+ const leftLeg=new THREE.Group();leftLeg.position.set(-.2,.75,0);root.add(leftLeg);
+ addBox(leftLeg,.25,.65,.29,dark,0,-.28,0);
+ const rightLeg=new THREE.Group();rightLeg.position.set(.2,.75,0);root.add(rightLeg);
+ addBox(rightLeg,.25,.65,.29,dark,0,-.28,0);
+ const sword=new THREE.Group();sword.position.set(.04,-.42,.05);rightArm.add(sword);
+ addBox(sword,.09,.8,.12,trim,0,.35,.0);
+ addBox(sword,.34,.08,.16,dark,0,-.05,0);
+ const shield=addBox(leftArm,.42,.55,.12,trim,0,-.25,.16);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.52,.035,8,32),makeMat(isEnemy?0xff5151:0x54caff,.3,.35));
+ ring.rotation.x=Math.PI/2;ring.position.y=.04;root.add(ring);
+ return {root,torso,leftArm,rightArm,leftLeg,rightLeg,sword,shield,ring,walk:0,attack:0,flash:0,isEnemy};
+}
+function addTree(x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.25,7),makeMat(0x60452e));trunk.position.y=.62;trunk.castShadow=true;g.add(trunk);
+ for(let i=0;i<3;i++){const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(.72-i*.1,1),makeMat(i%2?0x286344:0x347b4d));crown.position.set(0,1.45+i*.35,0);crown.castShadow=true;g.add(crown);}
+ arena.scene.add(g);
+}
+function addTower(x,z,color){
+ const g=new THREE.Group();g.position.set(x,0,z);
+ const base=new THREE.Mesh(new THREE.CylinderGeometry(.65,.8,.5,8),makeMat(0x59677b));base.position.y=.25;g.add(base);
+ const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.38,.55,1.8,8),makeMat(0x9a9eaa));shaft.position.y=1.35;g.add(shaft);
+ const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.42,1),new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.65}));orb.position.y=2.45;g.add(orb);
+ arena.scene.add(g);
+}
+function init3D(){
+ const wrap=$('arenaWrap'); if(!wrap) return;
+ const old=$('battleCanvas'); if(old) old.remove();
+ const canvas=document.createElement('canvas');canvas.id='battleCanvas';
+ canvas.style.cssText='display:block;width:100%;height:clamp(300px,58vw,540px);touch-action:none;';
+ wrap.insertBefore(canvas,wrap.firstChild);
+ const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.setClearColor(0x91b8c6);
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x91b8c6);scene.fog=new THREE.Fog(0x91b8c6,28,65);
+ const camera=new THREE.PerspectiveCamera(48,1,.1,100);camera.position.set(0,12,16);
+ scene.add(new THREE.HemisphereLight(0xd9edff,0x405438,2.0));
+ const sun=new THREE.DirectionalLight(0xffe2b2,2.5);sun.position.set(-8,16,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(48,38),makeMat(0x28613f));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ // MOBA lane and stone borders
+ const lane=new THREE.Mesh(new THREE.PlaneGeometry(48,7),makeMat(0x827d70));lane.rotation.x=-Math.PI/2;lane.position.y=.015;scene.add(lane);
+ const laneLine=makeMat(0xb9a985);[-3.6,3.6].forEach(z=>{const line=new THREE.Mesh(new THREE.BoxGeometry(48,.035,.08),laneLine);line.position.set(0,.05,z);scene.add(line);});
+ // terrain decoration
+ for(let i=0;i<18;i++){const x=-21+(i%9)*5.2,z=i<9?-12:12;addTree(x,z);}
+ for(let i=0;i<8;i++){const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(.45,0),makeMat(0x65736b));rock.position.set(-18+i*5.1,.3,(i%2?9:-9));rock.castShadow=true;scene.add(rock);}
+ addTower(-20,0,0x54caff);addTower(20,0,0xff5967);
+ arena.scene=scene;arena.camera=camera;arena.renderer=renderer;
+ arena.hero=makeFighter(0x9e2637,0xf1c66c,false);scene.add(arena.hero.root);
+ arena.enemy=makeFighter(0x293b70,0xff6666,true);scene.add(arena.enemy.root);
+ arena.hero.root.position.set(arena.player.x,0,arena.player.z);
+ arena.enemy.root.position.set(arena.bot.x,0,arena.bot.z);
+ const resize=()=>{const w=Math.max(320,wrap.clientWidth),h=Math.max(280,Math.min(540,Math.round(w*.58)));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
+ if(arena.resizeObserver)arena.resizeObserver.disconnect();
+ arena.resizeObserver=new ResizeObserver(resize);arena.resizeObserver.observe(wrap);resize();
+}
+function animateFighter(model,state,dt){
+ if(!model)return;
+ const moving=state.walk>0.05;
+ model.walk+=dt*(moving?10:2.2);
+ const swing=Math.sin(model.walk)*.62;
+ model.leftLeg.rotation.x=moving?swing:Math.sin(model.walk)*.025;
+ model.rightLeg.rotation.x=moving?-swing:0;
+ model.leftArm.rotation.x=moving?-swing*.55:0;
+ model.rightArm.rotation.x=moving?swing*.55:0;
+ model.torso.position.y=1.12+(moving?Math.abs(Math.sin(model.walk*2))*.045:Math.sin(model.walk)*.012);
+ if(model.attack>0){const k=Math.max(0,model.attack);model.rightArm.rotation.x=-1.9*Math.sin((1-k)*Math.PI);model.torso.rotation.y=.32*Math.sin((1-k)*Math.PI);model.sword.rotation.z=-.8*Math.sin((1-k)*Math.PI);}
+ else {model.torso.rotation.y=0;model.sword.rotation.z=0;}
+ model.ring.rotation.z+=dt*.8;
+ if(model.flash>0){model.flash-=dt;model.root.traverse(o=>{if(o.isMesh&&o.material.emissive){o.material.emissive.setHex(0x661111);}});}
+ else model.root.traverse(o=>{if(o.isMesh&&o.material.emissive)o.material.emissive.setHex(0x000000);});
+ model.attack=Math.max(0,model.attack-dt*2.8);
+}
+function spawnBurst(x,z,color,big=false){
+ const geo=new THREE.SphereGeometry(big?1.25:.65,16,12);
+ const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.75,wireframe:true});
+ const m=new THREE.Mesh(geo,mat);m.position.set(x,.8,z);arena.scene.add(m);arena.effectMeshes.push({mesh:m,life:big?1.05:.65,max:big?1.05:.65});
+}
+function render3D(dt){
+ if(!arena.renderer||!arena.scene)return;
+ animateFighter(arena.hero,arena.player,dt);animateFighter(arena.enemy,arena.bot,dt);
+ arena.effectMeshes.forEach(e=>{e.life-=dt;e.mesh.scale.multiplyScalar(1+dt*2.3);e.mesh.material.opacity=Math.max(0,e.life/e.max);});
+ arena.effectMeshes=arena.effectMeshes.filter(e=>{if(e.life<=0){arena.scene.remove(e.mesh);e.mesh.geometry.dispose();e.mesh.material.dispose();return false;}return true;});
+ const p=arena.player,b=arena.bot;
+ arena.hero.root.position.set(p.x,0,p.z);arena.enemy.root.position.set(b.x,0,b.z);
+ arena.hero.root.rotation.y=p.dir;arena.enemy.root.rotation.y=Math.atan2(p.x-b.x,p.z-b.z);
+ const target=new THREE.Vector3(p.x,0,p.z);
+ const desired=new THREE.Vector3(p.x,p.z+0,0); // camera follows player from behind
+ arena.camera.position.lerp(new THREE.Vector3(p.x,11,p.z+13),.08);
+ arena.camera.lookAt(target.x,0.7,target.z);
+ arena.renderer.render(arena.scene,arena.camera);
 }
 function updateHud(){
  $('heroHpHud').textContent='HP '+Math.max(0,Math.ceil(arena.player.hp))+'/'+arena.player.max;
@@ -199,67 +263,75 @@ function updateHud(){
  $('skill2Btn').textContent=arena.cooldown.s2>0?'Skill 2 ('+Math.ceil(arena.cooldown.s2)+')':'Skill 2';
  $('ultBtn').textContent=arena.cooldown.ult>0?'Ultimate ('+Math.ceil(arena.cooldown.ult)+')':'✦ Ultimate';
 }
+function startArena(){
+ if(!arena.renderer)init3D();
+ arena.running=true;arena.last=0;
+ if(arena.raf)cancelAnimationFrame(arena.raf);
+ arenaSay('Arena 3D dimulai! Gerakkan hero dengan joystick. Dekati musuh lalu gunakan serangan dan skill.');
+ updateHud();arena.raf=requestAnimationFrame(arenaLoop);
+}
+function stopArena(){arena.running=false;if(arena.raf)cancelAnimationFrame(arena.raf);}
 function arenaLoop(t){
  if(!arena.running)return;
  const dt=Math.min(.04,(t-arena.last)/1000||.016);arena.last=t;
  const p=arena.player,b=arena.bot;
- let dx=arena.joy.x,dy=arena.joy.y;
+ let dx=arena.joy.x, dz=arena.joy.y;
  if(arena.keys.ArrowLeft||arena.keys.a)dx-=1;if(arena.keys.ArrowRight||arena.keys.d)dx+=1;
- if(arena.keys.ArrowUp||arena.keys.w)dy-=1;if(arena.keys.ArrowDown||arena.keys.s)dy+=1;
- const mag=Math.hypot(dx,dy)||1;
- p.x=Math.max(35,Math.min(865,p.x+dx/mag*185*dt));
- p.y=Math.max(70,Math.min(500,p.y+dy/mag*185*dt));
- if(Math.hypot(dx,dy)>.1)p.dir=Math.atan2(dy,dx);
- // bot follows player and attacks at close range
- const bx=p.x-b.x,by=p.y-b.y,dist=Math.hypot(bx,by)||1;
- if(dist>72){b.x+=bx/dist*65*dt;b.y+=by/dist*65*dt;}
- else if(Math.random()<dt*.9){p.hp=Math.max(0,p.hp-5);p.flash=8;arena.effects.push({x:p.x,y:p.y,r:22,life:18,color:'#ff5555'});}
- p.flash=Math.max(0,p.flash-1);b.flash=Math.max(0,b.flash-1);
+ if(arena.keys.ArrowUp||arena.keys.w)dz-=1;if(arena.keys.ArrowDown||arena.keys.s)dz+=1;
+ const mag=Math.hypot(dx,dz);
+ p.walk=mag>.12?1:0;
+ if(mag>.12){dx/=Math.max(1,mag);dz/=Math.max(1,mag);p.x=THREE.MathUtils.clamp(p.x+dx*5.2*dt,-21,21);p.z=THREE.MathUtils.clamp(p.z+dz*5.2*dt,-15,15);p.dir=Math.atan2(dx,dz);}
+ const bx=p.x-b.x,bz=p.z-b.z,dist=Math.hypot(bx,bz)||1;
+ b.walk=dist>1.55?1:0;
+ if(dist>1.55){b.x+=bx/dist*2.05*dt;b.z+=bz/dist*2.05*dt;}
+ else if(Math.random()<dt*.8){p.hp=Math.max(0,p.hp-4);p.flash=.18;spawnBurst(p.x,p.z,0xff4444);}
  Object.keys(arena.cooldown).forEach(k=>arena.cooldown[k]=Math.max(0,arena.cooldown[k]-dt));
- arena.effects.forEach(e=>e.life--);arena.effects=arena.effects.filter(e=>e.life>0);
- if(b.hp<=0){arenaSay('Menang! Bot berhasil dikalahkan. Tekan Ulangi Pertarungan untuk bermain lagi.');}
- if(p.hp<=0){arenaSay('Hero tumbang. Tekan Ulangi Pertarungan untuk mencoba lagi.');}
- if(b.hp<=0||p.hp<=0)arena.running=false;
- drawArena();updateHud();
+ if(b.hp<=0){arenaSay('MENANG! Musuh berhasil dikalahkan. Tekan Ulangi Pertarungan untuk bermain lagi.');arena.running=false;}
+ if(p.hp<=0){arenaSay('Hero tumbang. Tekan Ulangi Pertarungan untuk mencoba lagi.');arena.running=false;}
+ render3D(dt);updateHud();
  if(arena.running)arena.raf=requestAnimationFrame(arenaLoop);
 }
-function damageBot(amount,color='#f4c85f',radius=65){
+function damageBot(amount,color=0xffd36a,radius=2.8){
  const p=arena.player,b=arena.bot;
- if(Math.hypot(p.x-b.x,p.y-b.y)>radius){arenaSay('Dekati bot terlebih dahulu agar serangan mengenai target.');return false;}
- b.hp=Math.max(0,b.hp-amount);b.flash=10;
- arena.effects.push({x:b.x,y:b.y,r:40,life:25,color});
- arenaSay(current().name+' mengenai bot! Damage '+amount+'.');
- return true;
+ if(Math.hypot(p.x-b.x,p.z-b.z)>radius){arenaSay('Dekati musuh terlebih dahulu agar serangan mengenai target.');return false;}
+ b.hp=Math.max(0,b.hp-amount);b.flash=.2;b.attackTime=.25;arena.enemy.attack=.45;
+ spawnBurst(b.x,b.z,color,amount>40);
+ arenaSay(current().name+' mengenai musuh! Damage '+amount+'.');return true;
 }
-function attack(){if(arena.cooldown.attack>0)return;arena.cooldown.attack=.55;damageBot(9,'#ffe08b',90);speakHero('Serang!');}
+function attack(){
+ if(arena.cooldown.attack>0)return;
+ arena.cooldown.attack=.58;arena.player.attackTime=.4;if(arena.hero)arena.hero.attack=.55;
+ damageBot(10,0xffd77a,3.1);speakHero('Serang!');
+}
 function useSkill(which){
- const cd=which==='s1'?5:which==='s2'?8:22;
  if(arena.cooldown[which]>0){arenaSay('Skill masih cooldown.');return;}
- arena.cooldown[which]=cd;
- const amount=which==='s1'?22:which==='s2'?30:65;
- const color=which==='s1'?'#69caff':which==='s2'?'#bd78ff':'#ffd35d';
- const hit=damageBot(amount,color,which==='ult'?260:145);
- if(hit){arena.effects.push({x:arena.player.x,y:arena.player.y,r:which==='ult'?190:100,life:35,color,width:12});speakHero(which==='ult'?'Kekuatan tertinggi!':which==='s1'?'Skill pertama!':'Skill kedua!');}
+ arena.cooldown[which]=which==='s1'?5:which==='s2'?8:22;
+ const amount=which==='s1'?24:which==='s2'?34:70;
+ const color=which==='s1'?0x62d5ff:which==='s2'?0xb779ff:0xffd34d;
+ if(arena.hero){arena.hero.attack=which==='ult'?1.2:.7;}
+ const range=which==='ult'?8:4.2;
+ const hit=damageBot(amount,color,range);
+ spawnBurst(arena.player.x,arena.player.z,color,which==='ult');
+ if(hit)speakHero(which==='ult'?'Kekuatan tertinggi!':which==='s1'?'Skill pertama!':'Skill kedua!');
 }
 function speakHero(line){
  if(!('speechSynthesis' in window))return;
- speechSynthesis.cancel();
- const utter=new SpeechSynthesisUtterance(current().name+': '+line);
- utter.lang='id-ID';utter.rate=.92;utter.pitch=1.0;speechSynthesis.speak(utter);
+ speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(current().name+': '+line);
+ utter.lang='id-ID';utter.rate=.92;speechSynthesis.speak(utter);
 }
 function toggleMusic(){
  if(arena.music){arena.music.osc.forEach(o=>{try{o.stop()}catch(e){}});arena.music.ctx.close();arena.music=null;$('musicBtn').textContent='♫ Musik: Mati';return;}
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC){arenaSay('Audio tidak didukung browser ini.');return;}
- const ctx=new AC(),master=ctx.createGain();master.gain.value=.045;master.connect(ctx.destination);
- const osc=[];
- // Original synthesized ambient loop, no external copyrighted track.
+ const ctx=new AC(),master=ctx.createGain();master.gain.value=.035;master.connect(ctx.destination);const osc=[];
  [110,164.81,220].forEach((freq,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=i===0?'sine':'triangle';o.frequency.value=freq;g.gain.value=i===0?.45:.16;o.connect(g);g.connect(master);o.start();osc.push(o);});
  arena.music={ctx,osc};$('musicBtn').textContent='♫ Musik: Nyala';arenaSay('Musik latar arena dinyalakan.');
 }
 function resetArena(){
- arena.player={x:230,y:280,hp:100,max:100,dir:0,attack:0,flash:0};
- arena.bot={x:670,y:270,hp:100,max:100,attack:0,flash:0};
- arena.effects=[];arena.cooldown={s1:0,s2:0,ult:0,attack:0};
+ arena.player={x:-5,z:0,hp:100,max:100,dir:0,flash:0,attackTime:0,walk:0};
+ arena.bot={x:5,z:0,hp:100,max:100,flash:0,attackTime:0,walk:0};
+ arena.cooldown={s1:0,s2:0,ult:0,attack:0};arena.effectMeshes.forEach(e=>{arena.scene?.remove(e.mesh);});arena.effectMeshes=[];
+ if(arena.hero){arena.hero.root.position.set(-5,0,0);arena.hero.root.rotation.set(0,0,0);}
+ if(arena.enemy){arena.enemy.root.position.set(5,0,0);arena.enemy.root.rotation.set(0,0,0);}
  startArena();updateHud();
 }
 $('attackBtn').addEventListener('click',attack);
