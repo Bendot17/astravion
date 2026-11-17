@@ -125,3 +125,157 @@ $('register').addEventListener('click',async()=>{try{await createUserWithEmailAn
 $('roomCreate').addEventListener('click',()=>{const code='AST-'+Math.random().toString(36).slice(2,7).toUpperCase();$('roomCode').textContent='Room '+($('roomName').value||'ASTRAVION')+' · '+code+' (simulasi lokal)';});
 onAuthStateChanged(auth,user=>{ $('loginPanel').hidden=!!user; $('game').hidden=!user; if(user){$('playerName').textContent=user.email.split('@')[0];$('playerEmail').textContent=user.email;} });
 render();
+
+
+// ===== ASTRAVION ARENA TRAINING MODE =====
+const arena = {
+ canvas: $('battleCanvas'), ctx: $('battleCanvas').getContext('2d'),
+ running:false, raf:0, last:0, keys:{}, joy:{x:0,y:0,active:false},
+ player:{x:230,y:280,hp:100,max:100,dir:0,attack:0,flash:0},
+ bot:{x:670,y:270,hp:100,max:100,attack:0,flash:0},
+ effects:[], cooldown:{s1:0,s2:0,ult:0,attack:0}, music:null, musicTimer:null, imgCache:{}
+};
+function arenaSay(t){ if($('arenaMessage')) $('arenaMessage').textContent=t; }
+function selectedArtwork(){ return ART[selected] ? ART[selected][selectedSkin] : ART.kael[0]; }
+function startArena(){
+ if(!arena.canvas) return;
+ $('arenaPage').hidden=false;
+ document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='arenaPage');
+ document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page==='arenaPage'));
+ arena.running=true; arena.last=0;
+ if(arena.raf) cancelAnimationFrame(arena.raf);
+ arenaSay('Pertarungan dimulai! Gerakkan hero dan kalahkan bot.');
+ arena.raf=requestAnimationFrame(arenaLoop);
+}
+function stopArena(){arena.running=false;if(arena.raf)cancelAnimationFrame(arena.raf);}
+function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+function drawArena(){
+ const c=arena.ctx, w=arena.canvas.width,h=arena.canvas.height,p=arena.player,b=arena.bot;
+ c.clearRect(0,0,w,h);
+ // battlefield grass, stone paths and lanes
+ c.fillStyle='#183d35';c.fillRect(0,0,w,h);
+ for(let i=0;i<16;i++){for(let j=0;j<10;j++){c.fillStyle=(i+j)%2?'#1b493a':'#204d3b';c.fillRect(i*60,j*60,60,60)}}
+ c.fillStyle='#8a7956';c.fillRect(0,230,w,82);c.fillRect(410,0,78,h);
+ c.strokeStyle='#c4aa75';c.lineWidth=3;c.setLineDash([14,12]);c.strokeRect(8,8,w-16,h-16);c.setLineDash([]);
+ // bushes and stones
+ for(const [x,y] of [[90,90],[170,440],[740,100],[790,430],[390,115],[520,420]]){
+  c.fillStyle='#102c27';c.beginPath();c.arc(x,y,27,0,Math.PI*2);c.fill();
+  c.fillStyle='#34714b';c.beginPath();c.arc(x-8,y-7,17,0,Math.PI*2);c.fill();
+ }
+ // towers
+ for(const [x,y,col] of [[70,270,'#4aa6df'],[830,270,'#e65c65']]){
+  c.fillStyle='#26374d';c.beginPath();c.arc(x,y,26,0,Math.PI*2);c.fill();
+  c.fillStyle=col;c.beginPath();c.arc(x,y,14,0,Math.PI*2);c.fill();
+  c.fillStyle='#fff';c.fillRect(x-3,y-35,6,18);
+ }
+ function drawFighter(unit,src,isEnemy){
+  let img=arena.imgCache[src];
+  if(!img){img=new Image();img.src=src;arena.imgCache[src]=img;}
+  c.save();
+  if(unit.flash>0){c.globalAlpha=.55+Math.random()*.45;}
+  c.fillStyle='#0008';c.beginPath();c.ellipse(unit.x,unit.y+29,27,9,0,0,Math.PI*2);c.fill();
+  if(img.complete&&img.naturalWidth){c.drawImage(img,unit.x-34,unit.y-65,68,96);}
+  else{c.fillStyle=isEnemy?'#a83245':'#d2a34f';c.beginPath();c.arc(unit.x,unit.y-12,23,0,Math.PI*2);c.fill();}
+  c.restore();
+  c.fillStyle='#111';c.fillRect(unit.x-32,unit.y-78,64,7);
+  c.fillStyle=isEnemy?'#e4545c':'#57d68a';c.fillRect(unit.x-32,unit.y-78,64*Math.max(0,unit.hp/unit.max),7);
+  c.fillStyle='#fff';c.font='bold 12px Arial';c.textAlign='center';c.fillText(isEnemy?'BOT MUSUH':current().name,unit.x,unit.y-86);
+ }
+ drawFighter(p,selectedArtwork(),false);
+ drawFighter(b,ART.darius[0],true);
+ // effects
+ for(const e of arena.effects){
+  c.save();c.globalAlpha=Math.max(0,e.life/30);
+  c.strokeStyle=e.color;c.lineWidth=e.width||7;c.beginPath();c.arc(e.x,e.y,e.r*(1.1-e.life/30),0,Math.PI*2);c.stroke();
+  c.restore();
+ }
+ c.fillStyle='#fff';c.font='13px Arial';c.textAlign='left';c.fillText('ARENA TRAINING · ASTRAVION',18,30);
+}
+function updateHud(){
+ $('heroHpHud').textContent='HP '+Math.max(0,Math.ceil(arena.player.hp))+'/'+arena.player.max;
+ $('botHud').textContent='BOT '+Math.max(0,Math.ceil(arena.bot.hp))+'/'+arena.bot.max;
+ $('skill1Btn').textContent=arena.cooldown.s1>0?'Skill 1 ('+Math.ceil(arena.cooldown.s1)+')':'Skill 1';
+ $('skill2Btn').textContent=arena.cooldown.s2>0?'Skill 2 ('+Math.ceil(arena.cooldown.s2)+')':'Skill 2';
+ $('ultBtn').textContent=arena.cooldown.ult>0?'Ultimate ('+Math.ceil(arena.cooldown.ult)+')':'✦ Ultimate';
+}
+function arenaLoop(t){
+ if(!arena.running)return;
+ const dt=Math.min(.04,(t-arena.last)/1000||.016);arena.last=t;
+ const p=arena.player,b=arena.bot;
+ let dx=arena.joy.x,dy=arena.joy.y;
+ if(arena.keys.ArrowLeft||arena.keys.a)dx-=1;if(arena.keys.ArrowRight||arena.keys.d)dx+=1;
+ if(arena.keys.ArrowUp||arena.keys.w)dy-=1;if(arena.keys.ArrowDown||arena.keys.s)dy+=1;
+ const mag=Math.hypot(dx,dy)||1;
+ p.x=Math.max(35,Math.min(865,p.x+dx/mag*185*dt));
+ p.y=Math.max(70,Math.min(500,p.y+dy/mag*185*dt));
+ if(Math.hypot(dx,dy)>.1)p.dir=Math.atan2(dy,dx);
+ // bot follows player and attacks at close range
+ const bx=p.x-b.x,by=p.y-b.y,dist=Math.hypot(bx,by)||1;
+ if(dist>72){b.x+=bx/dist*65*dt;b.y+=by/dist*65*dt;}
+ else if(Math.random()<dt*.9){p.hp=Math.max(0,p.hp-5);p.flash=8;arena.effects.push({x:p.x,y:p.y,r:22,life:18,color:'#ff5555'});}
+ p.flash=Math.max(0,p.flash-1);b.flash=Math.max(0,b.flash-1);
+ Object.keys(arena.cooldown).forEach(k=>arena.cooldown[k]=Math.max(0,arena.cooldown[k]-dt));
+ arena.effects.forEach(e=>e.life--);arena.effects=arena.effects.filter(e=>e.life>0);
+ if(b.hp<=0){arenaSay('Menang! Bot berhasil dikalahkan. Tekan Ulangi Pertarungan untuk bermain lagi.');}
+ if(p.hp<=0){arenaSay('Hero tumbang. Tekan Ulangi Pertarungan untuk mencoba lagi.');}
+ if(b.hp<=0||p.hp<=0)arena.running=false;
+ drawArena();updateHud();
+ if(arena.running)arena.raf=requestAnimationFrame(arenaLoop);
+}
+function damageBot(amount,color='#f4c85f',radius=65){
+ const p=arena.player,b=arena.bot;
+ if(Math.hypot(p.x-b.x,p.y-b.y)>radius){arenaSay('Dekati bot terlebih dahulu agar serangan mengenai target.');return false;}
+ b.hp=Math.max(0,b.hp-amount);b.flash=10;
+ arena.effects.push({x:b.x,y:b.y,r:40,life:25,color});
+ arenaSay(current().name+' mengenai bot! Damage '+amount+'.');
+ return true;
+}
+function attack(){if(arena.cooldown.attack>0)return;arena.cooldown.attack=.55;damageBot(9,'#ffe08b',90);speakHero('Serang!');}
+function useSkill(which){
+ const cd=which==='s1'?5:which==='s2'?8:22;
+ if(arena.cooldown[which]>0){arenaSay('Skill masih cooldown.');return;}
+ arena.cooldown[which]=cd;
+ const amount=which==='s1'?22:which==='s2'?30:65;
+ const color=which==='s1'?'#69caff':which==='s2'?'#bd78ff':'#ffd35d';
+ const hit=damageBot(amount,color,which==='ult'?260:145);
+ if(hit){arena.effects.push({x:arena.player.x,y:arena.player.y,r:which==='ult'?190:100,life:35,color,width:12});speakHero(which==='ult'?'Kekuatan tertinggi!':which==='s1'?'Skill pertama!':'Skill kedua!');}
+}
+function speakHero(line){
+ if(!('speechSynthesis' in window))return;
+ speechSynthesis.cancel();
+ const utter=new SpeechSynthesisUtterance(current().name+': '+line);
+ utter.lang='id-ID';utter.rate=.92;utter.pitch=1.0;speechSynthesis.speak(utter);
+}
+function toggleMusic(){
+ if(arena.music){arena.music.osc.forEach(o=>{try{o.stop()}catch(e){}});arena.music.ctx.close();arena.music=null;$('musicBtn').textContent='♫ Musik: Mati';return;}
+ const AC=window.AudioContext||window.webkitAudioContext;if(!AC){arenaSay('Audio tidak didukung browser ini.');return;}
+ const ctx=new AC(),master=ctx.createGain();master.gain.value=.045;master.connect(ctx.destination);
+ const osc=[];
+ // Original synthesized ambient loop, no external copyrighted track.
+ [110,164.81,220].forEach((freq,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=i===0?'sine':'triangle';o.frequency.value=freq;g.gain.value=i===0?.45:.16;o.connect(g);g.connect(master);o.start();osc.push(o);});
+ arena.music={ctx,osc};$('musicBtn').textContent='♫ Musik: Nyala';arenaSay('Musik latar arena dinyalakan.');
+}
+function resetArena(){
+ arena.player={x:230,y:280,hp:100,max:100,dir:0,attack:0,flash:0};
+ arena.bot={x:670,y:270,hp:100,max:100,attack:0,flash:0};
+ arena.effects=[];arena.cooldown={s1:0,s2:0,ult:0,attack:0};
+ startArena();updateHud();
+}
+$('attackBtn').addEventListener('click',attack);
+$('skill1Btn').addEventListener('click',()=>useSkill('s1'));
+$('skill2Btn').addEventListener('click',()=>useSkill('s2'));
+$('ultBtn').addEventListener('click',()=>useSkill('ult'));
+$('musicBtn').addEventListener('click',toggleMusic);
+$('voiceBtn').addEventListener('click',()=>speakHero('Aku siap bertarung!'));
+$('resetArena').addEventListener('click',resetArena);
+document.querySelectorAll('[data-page="arenaPage"]').forEach(btn=>btn.addEventListener('click',startArena));
+window.addEventListener('keydown',e=>{arena.keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();});
+window.addEventListener('keyup',e=>{arena.keys[e.key]=false;});
+const joyBase=$('joyBase'),joyKnob=$('joyKnob');
+if(joyBase){
+ const moveJoy=e=>{const r=joyBase.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let x=e.clientX-cx,y=e.clientY-cy;const d=Math.hypot(x,y),max=r.width*.32;if(d>max){x=x/d*max;y=y/d*max;}arena.joy.x=x/max;arena.joy.y=y/max;joyKnob.style.transform=`translate(${x}px,${y}px)`;};
+ joyBase.addEventListener('pointerdown',e=>{arena.joy.active=true;joyBase.setPointerCapture(e.pointerId);moveJoy(e);});
+ joyBase.addEventListener('pointermove',e=>{if(arena.joy.active)moveJoy(e);});
+ const endJoy=()=>{arena.joy.active=false;arena.joy.x=0;arena.joy.y=0;joyKnob.style.transform='translate(0,0)';};
+ joyBase.addEventListener('pointerup',endJoy);joyBase.addEventListener('pointercancel',endJoy);
+}
