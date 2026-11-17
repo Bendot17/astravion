@@ -1,235 +1,70 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#081229">
-<title>ASTRAVION — Legends of Eternal War</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081229"><title>ASTRAVION — Legends of Eternal War</title>
 <style>
 :root{--gold:#e9c36b;--panel:#111d38;--line:#34496d;--glow:#b52c38}
-*{box-sizing:border-box}
-body{margin:0;background:#071126;color:#f5f3ed;font:14px Arial,sans-serif}
-button,input{font:inherit}
-button{cursor:pointer;border:1px solid #80683d;border-radius:7px;padding:9px 12px;background:linear-gradient(#f1d68d,#bd8d3f);color:#171525;font-weight:bold}
-button:disabled{opacity:.5;cursor:not-allowed}
-header{padding:12px 18px;background:#0c1832;border-bottom:1px solid var(--gold);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:4}
-.brand{font:bold 22px Georgia;color:var(--gold);letter-spacing:3px}
-.brand small{display:block;font:8px Arial;color:#b9c7df;letter-spacing:1px}
-.spacer{flex:1}.wallet{color:var(--gold)}
+*{box-sizing:border-box}body{margin:0;background:#071126;color:#f5f3ed;font:14px Arial,sans-serif}
+button,input{font:inherit}button{cursor:pointer;border:1px solid #80683d;border-radius:7px;padding:9px 12px;background:linear-gradient(#f1d68d,#bd8d3f);color:#171525;font-weight:bold}
+button:disabled{opacity:.5;cursor:not-allowed}header{padding:12px 18px;background:#0c1832;border-bottom:1px solid var(--gold);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:4}
+.brand{font:bold 22px Georgia;color:var(--gold);letter-spacing:3px}.brand small{display:block;font:8px Arial;color:#b9c7df;letter-spacing:1px}.spacer{flex:1}.wallet{color:var(--gold)}
 .auth{max-width:420px;margin:65px auto;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
 input{width:100%;padding:12px;margin:7px 0;background:#091329;border:1px solid var(--line);border-radius:7px;color:white}
-.auth button{width:49%}
-.status,.notice{padding:10px;background:#091329;border:1px solid var(--line);border-radius:7px;color:#c8d5eb;font-size:12px;overflow-wrap:anywhere}
-nav{display:flex;gap:6px;overflow-x:auto;padding:9px;background:#0c1730}
-nav button{white-space:nowrap;background:#1a2a49;color:#e6eaf4;border:1px solid #34496d;font-size:12px}
-nav button.active{background:var(--gold);color:#171525}
-main{max-width:1450px;margin:auto;padding:14px}
-.profile{padding:11px;background:#111d38;border:1px solid var(--line);border-radius:9px;margin-bottom:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.view{display:none}.view.active{display:block}
-.panel{background:linear-gradient(145deg,#172746,#0d1830);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:13px}
-h1,h2,h3{font-family:Georgia,serif}
-h2{color:var(--gold);margin-top:0}.muted{color:#aebbd0}
-.hero-layout{display:grid;grid-template-columns:180px minmax(230px,1fr) 290px;gap:10px}
-.roster,.details{background:#0b1630;border:1px solid var(--line);border-radius:10px;padding:10px}
+.auth button{width:49%}.status,.notice{padding:10px;background:#091329;border:1px solid var(--line);border-radius:7px;color:#c8d5eb;font-size:12px;overflow-wrap:anywhere}
+nav{display:flex;gap:6px;overflow-x:auto;padding:9px;background:#0c1730}nav button{white-space:nowrap;background:#1a2a49;color:#e6eaf4;border:1px solid #34496d;font-size:12px}nav button.active{background:var(--gold);color:#171525}
+main{max-width:1450px;margin:auto;padding:14px}.profile{padding:11px;background:#111d38;border:1px solid var(--line);border-radius:9px;margin-bottom:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.view{display:none}.view.active{display:block}.panel{background:linear-gradient(145deg,#172746,#0d1830);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:13px}
+h1,h2,h3{font-family:Georgia,serif}h2{color:var(--gold);margin-top:0}.muted{color:#aebbd0}
+.hero-layout{display:grid;grid-template-columns:180px minmax(230px,1fr) 290px;gap:10px}.roster,.details{background:#0b1630;border:1px solid var(--line);border-radius:10px;padding:10px}
 .roster-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:620px;overflow:auto}
 .hero-pick{padding:5px;background:#172746;color:white;border:1px solid #34496d;text-align:left;min-width:0}
-.hero-pick.active{border-color:var(--gold);box-shadow:0 0 12px #c99c49}
-.hero-pick .mini{height:62px;border-radius:5px;display:grid;place-items:center;font-size:34px;margin-bottom:4px;background:radial-gradient(circle,var(--c),#101a32 75%)}
-.hero-pick strong{font-size:11px}
-.hero-pick small{display:block;color:#bdc9dc;font-size:9px}
+.hero-pick.active{border-color:var(--gold);box-shadow:0 0 12px #c99c49}.hero-pick .mini{height:62px;border-radius:5px;display:grid;place-items:center;font-size:34px;margin-bottom:4px;background:radial-gradient(circle,var(--c),#101a32 75%)}
+.hero-pick strong{font-size:11px}.hero-pick small{display:block;color:#bdc9dc;font-size:9px}
 .hero-art{min-height:510px;border:1px solid #6d5c48;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 38%,var(--glow),#17213d 48%,#080d20 85%)}
 .hero-art:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,transparent 0 28px,#ffffff08 29px 30px);opacity:.6}
 .character{position:relative;z-index:1;width:min(88%,440px);height:88%;min-height:380px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;filter:drop-shadow(0 18px 20px #000)}
 .character .sigil{font-size:clamp(115px,20vw,230px);line-height:1.15;text-shadow:0 0 25px var(--glow),0 10px 10px #000}
 .character .weapon{font-size:clamp(28px,5vw,52px);letter-spacing:10px;color:#fff;text-shadow:0 0 14px var(--glow)}
 .hero-caption{position:absolute;z-index:2;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,#050a18)}
-.hero-caption h1{font-size:30px;color:var(--gold);margin:0}
-.hero-caption p{margin:5px 0}
+.hero-caption h1{font-size:30px;color:var(--gold);margin:0}.hero-caption p{margin:5px 0}
 .role{display:inline-block;padding:5px 9px;border:1px solid var(--gold);border-radius:20px;color:var(--gold);font-size:11px}
-.stat{margin:12px 0;font-size:11px;color:#cbd6e8}
-.bar{height:7px;background:#263753;border-radius:10px;margin-top:5px;overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#9c7136,#f4d887)}
-.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:13px 0}
-.skill{background:#1a2b4b;border:1px solid #405577;border-radius:7px;text-align:center;padding:7px 2px;font-size:9px}
-.skill b{display:block;font-size:21px;margin-bottom:4px}
-.skin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:9px 0}
-.skin-choice{min-width:0;padding:5px;background:#1a2b4b;color:white;border-color:#405577;font-size:10px}
-.skin-choice .skin-icon{height:48px;display:grid;place-items:center;font-size:27px;border-radius:4px;margin-bottom:4px;background:radial-gradient(circle,var(--skin-glow),#101a32)}
-.skin-choice.active{border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px #c99c49}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
-.actions button:last-child{grid-column:span 2}
-.secondary{background:#1a3157;color:white;border-color:#5574a6}
-.bottom-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
-.bottom-tabs button{background:#1a3157;color:white;border-color:#5574a6}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-.card{background:#0c1932;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.card-art{height:130px;display:grid;place-items:center;font-size:62px;background:radial-gradient(circle,var(--c,#354b72),#0a142a)}
-.card-body{padding:11px}.card-body h3{color:var(--gold);margin:3px 0}
-.price{color:var(--gold)}
-.room-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.slot{padding:9px;margin:5px 0;background:#1b2b48;border-radius:6px}
+.stat{margin:12px 0;font-size:11px;color:#cbd6e8}.bar{height:7px;background:#263753;border-radius:10px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#9c7136,#f4d887)}
+.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:13px 0}.skill{background:#1a2b4b;border:1px solid #405577;border-radius:7px;text-align:center;padding:7px 2px;font-size:9px}.skill b{display:block;font-size:21px;margin-bottom:4px}
+.skin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:9px 0}.skin-choice{min-width:0;padding:5px;background:#1a2b4b;color:white;border-color:#405577;font-size:10px}.skin-choice .skin-icon{height:48px;display:grid;place-items:center;font-size:27px;border-radius:4px;margin-bottom:4px;background:radial-gradient(circle,var(--skin-glow),#101a32)}
+.skin-choice.active{border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px #c99c49}.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.actions button:last-child{grid-column:span 2}.secondary{background:#1a3157;color:white;border-color:#5574a6}
+.bottom-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.bottom-tabs button{background:#1a3157;color:white;border-color:#5574a6}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.card{background:#0c1932;border:1px solid var(--line);border-radius:9px;overflow:hidden}.card-art{height:130px;display:grid;place-items:center;font-size:62px;background:radial-gradient(circle,var(--c,#354b72),#0a142a)}.card-body{padding:11px}.card-body h3{color:var(--gold);margin:3px 0}.price{color:var(--gold)}
+.room-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.slot{padding:9px;margin:5px 0;background:#1b2b48;border-radius:6px}
 @media(max-width:850px){.hero-layout{grid-template-columns:135px minmax(170px,1fr)}.details{grid-column:1/-1}.hero-art{min-height:410px}.roster{grid-row:span 2}}
 @media(max-width:520px){header{padding:9px}.brand{font-size:18px}main{padding:8px}.hero-layout{grid-template-columns:105px minmax(0,1fr);gap:6px}.roster,.details{padding:7px}.hero-art{min-height:330px}.hero-caption h1{font-size:22px}.hero-pick .mini{height:48px}.hero-pick strong{font-size:10px}.character .sigil{font-size:115px}.room-columns{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-<div class="brand">ASTRAVION<small>LEGENDS OF ETERNAL WAR · DEVELOPED BY SUHENDRA</small></div>
-<div class="spacer"></div>
-<div class="wallet" id="wallet" hidden>🪙 0　💎 0</div>
-</header>
-
-<section class="auth" id="authPanel">
-<h1 style="color:var(--gold)">ASTRAVION</h1>
-<p class="muted">Masuk untuk melanjutkan petualangan.</p>
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button id="registerBtn">Daftar</button>
-<button id="loginBtn" class="secondary">Masuk</button>
-<p class="status" id="status">Menghubungkan ke Firebase...</p>
-</section>
-
+<header><div class="brand">ASTRAVION<small>LEGENDS OF ETERNAL WAR · DEVELOPED BY SUHENDRA</small></div><div class="spacer"></div><div class="wallet" id="wallet" hidden>🪙 0　💎 0</div></header>
+<section class="auth" id="authPanel"><h1 style="color:var(--gold)">ASTRAVION</h1><p class="muted">Masuk untuk melanjutkan petualangan.</p><input id="email" type="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button id="registerBtn">Daftar</button> <button id="loginBtn" class="secondary">Masuk</button><p class="status" id="status">Menghubungkan ke Firebase...</p></section>
 <div id="gameArea" hidden>
-<nav id="nav">
-<button class="active" data-view="home">Beranda</button>
-<button data-view="heroes">Hero</button>
-<button data-view="skins">Skin</button>
-<button data-view="shop">Toko</button>
-<button data-view="missions">Misi</button>
-<button data-view="rank">Rank</button>
-<button data-view="friends">Teman</button>
-<button data-view="rooms">Custom Room</button>
-<button id="logoutBtn">Keluar</button>
-</nav>
-
-<main>
-<div class="profile">
-<div><b id="welcome">Pemain</b><div class="muted" id="profileInfo">Pemain ASTRAVION</div></div>
-<div>LEVEL 1 · <span style="color:var(--gold)">WARRIOR III</span></div>
-</div>
-
-<section class="view active" id="home">
-<div class="panel" style="min-height:270px;background:radial-gradient(ellipse at 75%,#55402d,#172746 50%,#0a1429)">
-<p style="color:var(--gold);letter-spacing:4px">THE BATTLE BEGINS</p>
-<h1 style="font-size:clamp(30px,7vw,65px)">LEGENDS OF<br>ETERNAL WAR</h1>
-<p>Bangkitkan legenda. Kuasai arena. Pilih pahlawanmu!</p>
-<button data-goto="heroes">PILIH HERO</button>
-<button class="secondary" data-goto="rooms">CUSTOM ROOM</button>
-</div>
-</section>
-
-<section class="view" id="heroes">
-<div class="panel">
-<h2>HERO COLLECTION</h2>
-<div class="hero-layout">
-<aside class="roster">
-<h3>DAFTAR HERO</h3>
-<div class="roster-list" id="heroList"></div>
-</aside>
-<div class="hero-art" id="heroArt">
-<div class="character">
-<div class="sigil" id="heroSymbol">🔥</div>
-<div class="weapon" id="heroWeapon">⚔</div>
-</div>
-<div class="hero-caption">
-<h1 id="heroName">KAEL</h1>
-<p id="heroTitle">The Crimson Sovereign</p>
-</div>
-</div>
-<aside class="details">
-<h2 id="detailName">KAEL</h2>
-<p id="detailTitle"></p>
-<span class="role" id="heroRole"></span>
-<div id="heroStats"></div>
-<h3 style="color:var(--gold)">KEMAMPUAN</h3>
-<div class="skills" id="heroSkills"></div>
-<h3 style="color:var(--gold)">SKIN HERO</h3>
-<div class="skin-row" id="heroSkins"></div>
-<div class="actions">
-<button id="buyHero">Beli Hero</button>
-<button class="secondary" id="previewHero">Preview</button>
-<button class="secondary" id="tryHero">Coba Hero</button>
-</div>
-</aside>
-</div>
-<div class="bottom-tabs">
-<button data-info="Info">Info</button>
-<button data-info="Build">Build</button>
-<button data-info="Guide">Guide</button>
-<button data-info="Equipment">Equipment</button>
-</div>
-<div class="notice" id="heroMessage"></div>
-</div>
-</section>
-
-<section class="view" id="skins">
-<div class="panel">
-<h2>SKIN COLLECTION</h2>
-<p class="muted">Setiap skin dirancang khusus untuk karakter pemiliknya.</p>
-<div class="cards" id="skinList"></div>
-<div class="notice" id="skinMessage">Pilih skin untuk pratinjau.</div>
-</div>
-</section>
-
-<section class="view" id="shop">
-<div class="panel"><h2>ASTRAVION SHOP</h2><div class="cards" id="shopList"></div></div>
-</section>
-
-<section class="view" id="missions">
-<div class="panel"><h2>MISI HARIAN</h2><div class="notice">Masuk ke ASTRAVION — hadiah rancangan 50 Coin. Klaim belum aktif.</div></div>
-</section>
-
-<section class="view" id="rank">
-<div class="panel"><h2>RANK PEMAIN</h2><h1>👑 Warrior III</h1><p>Mode Ranked segera hadir.</p></div>
-</section>
-
-<section class="view" id="friends">
-<div class="panel">
-<h2>TEMAN</h2>
-<input id="friendSearch" placeholder="Masukkan ID pemain">
-<button id="searchFriend">Cari</button>
-<div id="friendResult" class="notice">Pencarian teman online belum aktif.</div>
-</div>
-</section>
-
-<section class="view" id="rooms">
-<div class="panel">
-<h2>CUSTOM ROOM 5 VS 5</h2>
-<input id="roomName" placeholder="Nama room">
-<button id="createRoom">Buat Room</button>
-<button class="secondary" id="fillBots">Isi Bot</button>
-<div class="notice" id="roomCode">Belum ada room.</div>
-<div class="room-columns">
-<div class="panel"><h3>🔵 BLUE TEAM</h3><div id="blueSlots"></div></div>
-<div class="panel"><h3>🔴 RED TEAM</h3><div id="redSlots"></div></div>
-</div>
-</div>
-</section>
-
-<p class="status" id="gameStatus">ASTRAVION siap dalam mode pratinjau.</p>
-</main>
-</div>
-
+<nav id="nav"><button class="active" data-view="home">Beranda</button><button data-view="heroes">Hero</button><button data-view="skins">Skin</button><button data-view="shop">Toko</button><button data-view="missions">Misi</button><button data-view="rank">Rank</button><button data-view="friends">Teman</button><button data-view="rooms">Custom Room</button><button id="logoutBtn">Keluar</button></nav>
+<main><div class="profile"><div><b id="welcome">Pemain</b><div class="muted" id="profileInfo">Pemain ASTRAVION</div></div><div>LEVEL 1 · <span style="color:var(--gold)">WARRIOR III</span></div></div>
+<section class="view active" id="home"><div class="panel" style="min-height:270px;background:radial-gradient(ellipse at 75%,#55402d,#172746 50%,#0a1429)"><p style="color:var(--gold);letter-spacing:4px">THE BATTLE BEGINS</p><h1 style="font-size:clamp(30px,7vw,65px)">LEGENDS OF<br>ETERNAL WAR</h1><p>Bangkitkan legenda. Kuasai arena. Pilih pahlawanmu!</p><button data-goto="heroes">PILIH HERO</button><button class="secondary" data-goto="rooms">CUSTOM ROOM</button></div></section>
+<section class="view" id="heroes"><div class="panel"><h2>HERO COLLECTION</h2><div class="hero-layout">
+<aside class="roster"><h3>DAFTAR HERO</h3><div class="roster-list" id="heroList"></div></aside>
+<div class="hero-art" id="heroArt"><div class="character"><div class="sigil" id="heroSymbol">🔥</div><div class="weapon" id="heroWeapon">⚔</div></div><div class="hero-caption"><h1 id="heroName">KAEL</h1><p id="heroTitle">The Crimson Sovereign</p></div></div>
+<aside class="details"><h2 id="detailName">KAEL</h2><p id="detailTitle"></p><span class="role" id="heroRole"></span><div id="heroStats"></div><h3 style="color:var(--gold)">KEMAMPUAN</h3><div class="skills" id="heroSkills"></div><h3 style="color:var(--gold)">SKIN HERO</h3><div class="skin-row" id="heroSkins"></div><div class="actions"><button id="buyHero">Beli Hero</button><button class="secondary" id="previewHero">Preview</button><button class="secondary" id="tryHero">Coba Hero</button></div></aside></div>
+<div class="bottom-tabs"><button data-info="Info">Info</button><button data-info="Build">Build</button><button data-info="Guide">Guide</button><button data-info="Equipment">Equipment</button></div><div class="notice" id="heroMessage"></div></div></section>
+<section class="view" id="skins"><div class="panel"><h2>SKIN COLLECTION</h2><p class="muted">Setiap skin dirancang khusus untuk karakter pemiliknya.</p><div class="cards" id="skinList"></div><div class="notice" id="skinMessage">Pilih skin untuk pratinjau.</div></div></section>
+<section class="view" id="shop"><div class="panel"><h2>ASTRAVION SHOP</h2><div class="cards" id="shopList"></div></div></section>
+<section class="view" id="missions"><div class="panel"><h2>MISI HARIAN</h2><div class="notice">Masuk ke ASTRAVION — hadiah rancangan 50 Coin. Klaim belum aktif.</div></div></section>
+<section class="view" id="rank"><div class="panel"><h2>RANK PEMAIN</h2><h1>👑 Warrior III</h1><p>Mode Ranked segera hadir.</p></div></section>
+<section class="view" id="friends"><div class="panel"><h2>TEMAN</h2><input id="friendSearch" placeholder="Masukkan ID pemain"><button id="searchFriend">Cari</button><div id="friendResult" class="notice">Pencarian teman online belum aktif.</div></div></section>
+<section class="view" id="rooms"><div class="panel"><h2>CUSTOM ROOM 5 VS 5</h2><input id="roomName" placeholder="Nama room"><button id="createRoom">Buat Room</button> <button class="secondary" id="fillBots">Isi Bot</button><div class="notice" id="roomCode">Belum ada room.</div><div class="room-columns"><div class="panel"><h3>🔵 BLUE TEAM</h3><div id="blueSlots"></div></div><div class="panel"><h3>🔴 RED TEAM</h3><div id="redSlots"></div></div></div></div></section>
+<p class="status" id="gameStatus">ASTRAVION siap dalam mode pratinjau.</p></main></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyDPe6j8IyIjJcOtj-dseql3fPi4ZwpUVEs",
-authDomain:"astravion-14175.firebaseapp.com",
-projectId:"astravion-14175",
-storageBucket:"astravion-14175.firebasestorage.app",
-messagingSenderId:"192926200620",
-appId:"1:192926200620:web:9af565bf5d2a26fade7289",
-measurementId:"G-E32VWS5SXZ"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const $=id=>document.getElementById(id);
+const firebaseConfig={apiKey:"AIzaSyDPe6j8IyIjJcOtj-dseql3fPi4ZwpUVEs",authDomain:"astravion-14175.firebaseapp.com",projectId:"astravion-14175",storageBucket:"astravion-14175.firebasestorage.app",messagingSenderId:"192926200620",appId:"1:192926200620:web:9af565bf5d2a26fade7289",measurementId:"G-E32VWS5SXZ"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),$=id=>document.getElementById(id);
 const say=m=>{$("status").textContent=m;$("gameStatus").textContent=m};
-
 const heroes=[
 {id:"KAEL",name:"Kael",title:"The Crimson Sovereign",role:"Fighter / Assassin",icon:"🔥",weapon:"⚔️",glow:"#a51d32",desc:"Penguasa bara merah yang bertarung dengan pedang iblis dan energi bulan darah.",price:1600,stats:[78,96,82,74],skills:["🔥","🩸","⚔️","☄️"],skins:[["Crimson Sovereign","Default","🔥","#9d1e31"],["Shadow Reaper","Epic","🌑","#4b315f"],["Dragon Emperor","Legendary","🐉","#b77b26"]]},
 {id:"AURELIA",name:"Aurelia",title:"Starlight Oracle",role:"Mage / Support",icon:"✨",weapon:"🔮",glow:"#8e70db",desc:"Ratu sihir bintang yang mengendalikan cahaya kosmik dan mantra penyembuh.",price:1500,stats:[52,82,98,80],skills:["✨","🌟","🔮","🌌"],skins:[["Celestial Oracle","Default","🌟","#8067ce"],["Crystal Empress","Epic","💎","#70c9e8"],["Dawn Goddess","Legendary","☀️","#d8a54e"]]},
@@ -242,126 +77,34 @@ const heroes=[
 {id:"VALKYRIE",name:"Valkyrie",title:"Dawnwing Champion",role:"Fighter / Support",icon:"🪽",weapon:"⚔️",glow:"#c08b3e",desc:"Prajurit fajar bersayap emas yang memimpin serangan dari langit.",price:1600,stats:[84,88,91,72],skills:["🪽","⚔️","☀️","🌅"],skins:[["Dawnwing Champion","Default","🪽","#c08b3e"],["Frost Valkyrie","Epic","❄️","#82c5d9"],["Phoenix Empress","Legendary","🔥","#b94b30"]]},
 {id:"RIZKY",name:"Rizky",title:"Eternal Challenger",role:"Fighter",icon:"⚔️",weapon:"🥊",glow:"#637b9c",desc:"Petarung arena dengan zirah futuristik, sarung tangan energi, dan teknik cepat.",price:1200,stats:[76,85,72,55],skills:["🥊","⚡","🛡️","💥"],skins:[["Arena Challenger","Default","⚔️","#637b9c"],["Neon Striker","Epic","⚡","#397bba"],["Cyber Ronin","Legendary","🗡️","#a24c75"]]}
 ];
-
-let selected="KAEL";
-let selectedSkin=0;
-let room=null;
+let selected="KAEL",selectedSkin=0,room=null;
 const hero=()=>heroes.find(h=>h.id===selected)||heroes[0];
-
-function showView(id){
-document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
-document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
-}
-document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showView(b.dataset.view));
-document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>showView(b.dataset.goto));
-
+function showView(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id))}
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showView(b.dataset.view));document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>showView(b.dataset.goto));
 function renderHeroes(){
-$("heroList").innerHTML=heroes.map(h=>`<button class="hero-pick ${h.id===selected?"active":""}" data-hero="${h.id}" style="--c:${h.glow}"><div class="mini">${h.icon}</div><strong>${h.name}</strong><small>${h.role}</small></button>`).join("");
-
-document.querySelectorAll("[data-hero]").forEach(b=>b.onclick=()=>{
-selected=b.dataset.hero;
-selectedSkin=0;
-renderHeroes();
-});
-
-const h=hero(),s=h.skins[selectedSkin];
-$("heroName").textContent=h.name.toUpperCase();
-$("heroTitle").textContent=h.title;
-$("detailName").textContent=h.name;
-$("detailTitle").textContent=h.desc;
-$("heroRole").textContent=h.role;
-$("heroArt").style.setProperty("--glow",s[3]);
-$("heroSymbol").textContent=s[2]==="🔥"?"🔥":h.icon;
-$("heroWeapon").textContent=h.weapon;
-
-$("heroStats").innerHTML=["Durability","Offense","Skill Effects","Tingkat Kesulitan"].map((n,i)=>`<div class="stat">${n}<b style="float:right">${h.stats[i]}%</b><div class="bar"><i style="width:${h.stats[i]}%"></i></div></div>`).join("");
-
-$("heroSkills").innerHTML=h.skills.map((v,i)=>`<div class="skill"><b>${v}</b>${["Passive","Skill 1","Skill 2","Ultimate"][i]}</div>`).join("");
-
-$("heroSkins").innerHTML=h.skins.map((x,i)=>`<button class="skin-choice ${i===selectedSkin?"active":""}" data-heroskin="${i}" style="--skin-glow:${x[3]}"><div class="skin-icon">${x[2]}</div>${x[0]}</button>`).join("");
-
-document.querySelectorAll("[data-heroskin]").forEach(b=>b.onclick=()=>{
-selectedSkin=Number(b.dataset.heroskin);
-renderHeroes();
-say("Pratinjau skin "+hero().skins[selectedSkin][0]);
-});
-
-$("heroMessage").textContent=h.name+" — "+h.title+". Skin aktif: "+s[0]+". Setiap hero memiliki tiga skin tematik.";
+ $("heroList").innerHTML=heroes.map(h=>`<button class="hero-pick ${h.id===selected?"active":""}" data-hero="${h.id}" style="--c:${h.glow}"><div class="mini">${h.icon}</div><strong>${h.name}</strong><small>${h.role}</small></button>`).join("");
+ document.querySelectorAll("[data-hero]").forEach(b=>b.onclick=()=>{selected=b.dataset.hero;selectedSkin=0;renderHeroes()});
+ const h=hero(),s=h.skins[selectedSkin];$("heroName").textContent=h.name.toUpperCase();$("heroTitle").textContent=h.title;$("detailName").textContent=h.name;$("detailTitle").textContent=h.desc;$("heroRole").textContent=h.role;
+ $("heroArt").style.setProperty("--glow",s[3]);$("heroSymbol").textContent=s[2]==="🔥"?"🔥":h.icon;$("heroWeapon").textContent=h.weapon;
+ $("heroStats").innerHTML=["Durability","Offense","Skill Effects","Tingkat Kesulitan"].map((n,i)=>`<div class="stat">${n}<b style="float:right">${h.stats[i]}%</b><div class="bar"><i style="width:${h.stats[i]}%"></i></div></div>`).join("");
+ $("heroSkills").innerHTML=h.skills.map((v,i)=>`<div class="skill"><b>${v}</b>${["Passive","Skill 1","Skill 2","Ultimate"][i]}</div>`).join("");
+ $("heroSkins").innerHTML=h.skins.map((x,i)=>`<button class="skin-choice ${i===selectedSkin?"active":""}" data-heroskin="${i}" style="--skin-glow:${x[3]}"><div class="skin-icon">${x[2]}</div>${x[0]}</button>`).join("");
+ document.querySelectorAll("[data-heroskin]").forEach(b=>b.onclick=()=>{selectedSkin=Number(b.dataset.heroskin);renderHeroes();say("Pratinjau skin "+hero().skins[selectedSkin][0])});
+ $("heroMessage").textContent=h.name+" — "+h.title+". Skin aktif: "+s[0]+". Setiap hero memiliki tiga skin tematik.";
 }
-
 function renderSkins(){
-$("skinList").innerHTML=heroes.flatMap(h=>h.skins.map((s,i)=>`<article class="card"><div class="card-art" style="--c:${s[3]}">${s[2]}</div><div class="card-body"><h3>${s[0]}</h3><p>${h.name} · ${s[1]}</p><p class="muted">${h.title}</p><button class="secondary" data-skinhero="${h.id}" data-skinindex="${i}">Pratinjau Skin</button></div></article>`)).join("");
-
-document.querySelectorAll("[data-skinhero]").forEach(b=>b.onclick=()=>{
-selected=b.dataset.skinhero;
-selectedSkin=Number(b.dataset.skinindex);
-renderHeroes();
-showView("heroes");
-say("Skin "+hero().skins[selectedSkin][0]+" dipilih.");
-});
+ $("skinList").innerHTML=heroes.flatMap(h=>h.skins.map((s,i)=>`<article class="card"><div class="card-art" style="--c:${s[3]}">${s[2]}</div><div class="card-body"><h3>${s[0]}</h3><p>${h.name} · ${s[1]}</p><p class="muted">${h.title}</p><button class="secondary" data-skinhero="${h.id}" data-skinindex="${i}">Pratinjau Skin</button></div></article>`)).join("");
+ document.querySelectorAll("[data-skinhero]").forEach(b=>b.onclick=()=>{selected=b.dataset.skinhero;selectedSkin=Number(b.dataset.skinindex);renderHeroes();showView("heroes");say("Skin "+hero().skins[selectedSkin][0]+" dipilih.")});
 }
-
-function renderShop(){
-$("shopList").innerHTML=heroes.map(h=>`<article class="card"><div class="card-art" style="--c:${h.glow}">${h.icon}</div><div class="card-body"><h3>${h.name}</h3><p>${h.role}</p><b class="price">${h.price} Coin</b><p><button disabled>Segera Hadir</button></p></div></article>`).join("");
-}
-
-renderHeroes();
-renderSkins();
-renderShop();
-
-$("registerBtn").onclick=async()=>{
-try{
-await createUserWithEmailAndPassword(auth,$("email").value,$("password").value);
-say("Akun berhasil dibuat.");
-}catch(e){say("Pendaftaran gagal: "+e.message)}
-};
-
-$("loginBtn").onclick=async()=>{
-try{
-await signInWithEmailAndPassword(auth,$("email").value,$("password").value);
-say("Login berhasil.");
-}catch(e){say("Login gagal: "+e.message)}
-};
-
+function renderShop(){$("shopList").innerHTML=heroes.map(h=>`<article class="card"><div class="card-art" style="--c:${h.glow}">${h.icon}</div><div class="card-body"><h3>${h.name}</h3><p>${h.role}</p><b class="price">${h.price} Coin</b><p><button disabled>Segera Hadir</button></p></div></article>`).join("")}
+renderHeroes();renderSkins();renderShop();
+$("registerBtn").onclick=async()=>{try{await createUserWithEmailAndPassword(auth,$("email").value,$("password").value);say("Akun berhasil dibuat.")}catch(e){say("Pendaftaran gagal: "+e.message)}};
+$("loginBtn").onclick=async()=>{try{await signInWithEmailAndPassword(auth,$("email").value,$("password").value);say("Login berhasil.")}catch(e){say("Login gagal: "+e.message)}};
 $("logoutBtn").onclick=()=>signOut(auth);
-
-onAuthStateChanged(auth,user=>{
-$("authPanel").hidden=!!user;
-$("gameArea").hidden=!user;
-$("wallet").hidden=!user;
-if(user){
-$("welcome").textContent=user.email.split("@")[0];
-$("profileInfo").textContent=user.email;
-showView("home");
-say("Login berhasil. Selamat datang di ASTRAVION.");
-}
-});
-
-$("buyHero").onclick=()=>say("Pembelian belum diaktifkan. Saldo tidak dipotong.");
-$("previewHero").onclick=()=>say("Preview "+hero().name+" — "+hero().skins[selectedSkin][0]);
-$("tryHero").onclick=()=>say("Mode latihan akan dikembangkan pada tahap arena.");
-
-document.querySelectorAll("[data-info]").forEach(b=>b.onclick=()=>{
-$("heroMessage").textContent=b.dataset.info+" "+hero().name+" akan dikembangkan.";
-});
-
-$("searchFriend").onclick=()=>{
-$("friendResult").textContent="Pencarian online belum diaktifkan. ID: "+$("friendSearch").value;
-};
-
-$("createRoom").onclick=()=>{
-room={code:"AST-"+Math.random().toString(36).slice(2,7).toUpperCase(),name:$("roomName").value||"Arena ASTRAVION"};
-$("roomCode").textContent=room.name+" · Kode: "+room.code+" (simulasi lokal)";
-$("blueSlots").innerHTML=Array.from({length:5},(_,i)=>`<div class="slot">${i===0?$("welcome").textContent:"Slot kosong"}</div>`).join("");
-$("redSlots").innerHTML=Array.from({length:5},()=>'<div class="slot">Slot kosong</div>').join("");
-};
-
-$("fillBots").onclick=()=>{
-if(!room){say("Buat room terlebih dahulu.");return}
-$("blueSlots").innerHTML=["Pemain","Bot Guardian","Bot Archer","Bot Mage","Bot Support"].map(x=>`<div class="slot">${x}</div>`).join("");
-$("redSlots").innerHTML=["Bot Fighter","Bot Assassin","Bot Ranger","Bot Healer","Bot Knight"].map(x=>`<div class="slot">${x}</div>`).join("");
-say("Bot simulasi ditambahkan.");
-};
-</script>
-</body>
-</html>
+onAuthStateChanged(auth,user=>{$("authPanel").hidden=!!user;$("gameArea").hidden=!user;$("wallet").hidden=!user;if(user){$("welcome").textContent=user.email.split("@")[0];$("profileInfo").textContent=user.email;showView("home");say("Login berhasil. Selamat datang di ASTRAVION.")}});
+$("buyHero").onclick=()=>say("Pembelian belum diaktifkan. Saldo tidak dipotong.");$("previewHero").onclick=()=>say("Preview "+hero().name+" — "+hero().skins[selectedSkin][0]);$("tryHero").onclick=()=>say("Mode latihan akan dikembangkan pada tahap arena.");
+document.querySelectorAll("[data-info]").forEach(b=>b.onclick=()=>{$("heroMessage").textContent=b.dataset.info+" "+hero().name+" akan dikembangkan."});
+$("searchFriend").onclick=()=>{$("friendResult").textContent="Pencarian online belum diaktifkan. ID: "+$("friendSearch").value};
+$("createRoom").onclick=()=>{room={code:"AST-"+Math.random().toString(36).slice(2,7).toUpperCase(),name:$("roomName").value||"Arena ASTRAVION"};$("roomCode").textContent=room.name+" · Kode: "+room.code+" (simulasi lokal)";$("blueSlots").innerHTML=Array.from({length:5},(_,i)=>`<div class="slot">${i===0?$("welcome").textContent:"Slot kosong"}</div>`).join("");$("redSlots").innerHTML=Array.from({length:5},()=>'<div class="slot">Slot kosong</div>').join("")};
+$("fillBots").onclick=()=>{if(!room){say("Buat room terlebih dahulu.");return}$("blueSlots").innerHTML=["Pemain","Bot Guardian","Bot Archer","Bot Mage","Bot Support"].map(x=>`<div class="slot">${x}</div>`).join("");$("redSlots").innerHTML=["Bot Fighter","Bot Assassin","Bot Ranger","Bot Healer","Bot Knight"].map(x=>`<div class="slot">${x}</div>`).join("");say("Bot simulasi ditambahkan.")};
+</script></body></html>
