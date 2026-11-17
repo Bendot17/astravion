@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10172b">
+  <title>ASTRAVION — Legends of Eternal War</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#0b1020;color:#eef2ff;font:16px system-ui,Arial}
+    header{padding:24px 18px;background:linear-gradient(135deg,#17264b,#10172b);border-bottom:1px solid #33415f}
+    h1{margin:0;color:#e8c66a;letter-spacing:3px}header p{margin:6px 0 0;color:#aebbd8}
+    main{max-width:900px;margin:24px auto;padding:0 14px}.panel{background:#151e35;border:1px solid #33415f;border-radius:14px;padding:18px;margin-bottom:16px}
+    input,button{width:100%;padding:12px;border-radius:9px;border:1px solid #455779;margin:6px 0;background:#0d1529;color:#fff}
+    button{background:#b58a32;color:#111827;font-weight:700;border:0;cursor:pointer}button.secondary{background:#293957;color:#fff}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{width:auto}
+    .muted{color:#aebbd8;font-size:14px}.status{padding:10px;border-radius:8px;background:#0d1529;white-space:pre-wrap}
+    [hidden]{display:none!important}@media(max-width:600px){.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header><h1>ASTRAVION</h1><p>LEGENDS OF ETERNAL WAR · Developed by Suhendra</p></header>
+<main>
+  <section class="panel">
+    <h2>Akun Pemain</h2>
+    <div id="authForm">
+      <input id="email" type="email" placeholder="Email" autocomplete="email">
+      <input id="password" type="password" placeholder="Password (minimal 6 karakter)" autocomplete="current-password">
+      <div class="row"><button id="registerBtn">Daftar</button><button id="loginBtn" class="secondary">Masuk</button></div>
+    </div>
+    <div id="profile" hidden>
+      <p id="profileInfo"></p><button id="logoutBtn" class="secondary">Keluar</button>
+    </div>
+    <p id="status" class="status">Menghubungkan ke Firebase…</p>
+  </section>
+  <section id="appArea" hidden>
+    <section class="panel">
+      <h2>Menu ASTRAVION</h2>
+      <div class="tabs"><button data-tab="player">Pemain</button><button data-tab="organizer">Organizer</button><button data-tab="invites">Undangan Wasit</button></div>
+      <div id="player" class="tab"><h3>Profil Pemain</h3><p class="muted">ID pemain dibuat oleh server setelah pendaftaran.</p></div>
+      <div id="organizer" class="tab" hidden><h3>Buat Turnamen</h3><input id="tournamentName" placeholder="Nama turnamen"><button id="createTournamentBtn">Buat turnamen</button><h3>Undang Wasit</h3><input id="refereeId" placeholder="ID pemain calon wasit"><button id="inviteBtn">Kirim undangan</button><p class="muted">Fitur organizer memerlukan klaim organizer yang diberikan secara aman melalui Admin SDK.</p></div>
+      <div id="invites" class="tab" hidden><h3>Undangan Wasit</h3><button id="refreshInvitesBtn" class="secondary">Muat undangan</button><div id="inviteList"></div></div>
+    </section>
+  </section>
+</main>
+<script type="module" src="./app.js"></script>
+</body></html>
