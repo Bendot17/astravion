@@ -9,6 +9,17 @@
 .arena-controls button{min-width:72px}
 @media(max-width:520px){.arena-controls{align-items:center}.arena-controls>div:last-child{max-width:220px}.arena-controls button{padding:9px 8px;font-size:11px}#joyBase{width:100px!important;height:100px!important}#joyKnob{left:26px!important;top:26px!important}}
 
+
+/* HERO IDLE + SKIN MOTION */
+@keyframes astravionHeroIdle{0%,100%{transform:translateY(0) scale(1) rotate(0deg);filter:drop-shadow(0 15px 20px #000)}50%{transform:translateY(-13px) scale(1.018) rotate(.45deg);filter:drop-shadow(0 23px 24px #000)}}
+@keyframes astravionCardPulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.025)}}
+@keyframes astravionGlow{0%,100%{box-shadow:0 0 7px #e8c36b33}50%{box-shadow:0 0 20px #e8c36b99}}
+#heroArtwork{animation:astravionHeroIdle 3.2s ease-in-out infinite;transform-origin:50% 75%}
+.hero-card img,.skin-card img,.skin-tile img{animation:astravionCardPulse 3.8s ease-in-out infinite;transform-origin:50% 80%}
+.hero-card:nth-child(2n) img,.skin-card:nth-child(2n) img{animation-delay:-1.4s}
+.showcase{animation:astravionGlow 4s ease-in-out infinite}
+#battleCanvas{display:block;width:100%;height:clamp(300px,58vw,540px);touch-action:none}
+
 </style>
 </head>
 <body>

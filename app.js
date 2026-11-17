@@ -113,12 +113,12 @@ function render(){
  $('heroQuote').textContent='“'+h.quote+'”';
 }
 
-function showPage(page){document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!==page);document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='skinPage')renderAllSkins();}
+function showPage(page){document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!==page);document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='skinPage')renderAllSkins();if(page==='arenaPage'){requestAnimationFrame(()=>requestAnimationFrame(()=>startArena()));}else if(typeof stopArena==='function')stopArena();}
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function renderAllSkins(){ $('allSkins').innerHTML=heroes.flatMap(h=>h.skins.map((s,i)=>`<article class="skin-tile"><img src="${ART[h.id][i]}" alt="${s}"><h3>${s}</h3><p>${h.name} · ${h.title}</p><button data-openhero="${h.id}" data-openskin="${i}">Lihat Skin</button></article>`)).join('');document.querySelectorAll('[data-openhero]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.openhero;selectedSkin=Number(b.dataset.openskin);render();showPage('heroPage');})); }
 $('buyHero').addEventListener('click',()=>{const h=current();if(owned.includes(h.id)){say(h.name+' sudah dimiliki.');return;}let coins=Number(localStorage.getItem('astravionCoins')||32000);if(coins<h.price){say('Coin tidak cukup.');return;}coins-=h.price;localStorage.setItem('astravionCoins',coins);owned.push(h.id);localStorage.setItem('astravionOwnedHeroes',JSON.stringify(owned));render();say(h.name+' berhasil dibeli (tersimpan di browser ini).');});
 $('previewHero').addEventListener('click',()=>say('Preview: '+current().name+' — '+current().skins[selectedSkin]));
-$('tryHero').addEventListener('click',()=>{resetArena();showPage('arenaPage');arenaSay('Mode coba dimulai! Gerakkan hero dengan joystick atau WASD, lalu serang bot.');});
+$('tryHero').addEventListener('click',()=>{showPage('arenaPage');resetArena();arenaSay('Mode coba dimulai! Gerakkan hero dengan joystick atau WASD, lalu serang bot.');});
 $('logout').addEventListener('click',()=>signOut(auth));
 $('login').addEventListener('click',async()=>{try{await signInWithEmailAndPassword(auth,$('email').value,$('password').value);}catch(e){$('authMessage').textContent='Login gagal: '+e.message;}});
 $('register').addEventListener('click',async()=>{try{await createUserWithEmailAndPassword(auth,$('email').value,$('password').value);}catch(e){$('authMessage').textContent='Daftar gagal: '+e.message;}});
@@ -194,7 +194,9 @@ function init3D(){
  const canvas=document.createElement('canvas');canvas.id='battleCanvas';
  canvas.style.cssText='display:block;width:100%;height:clamp(300px,58vw,540px);touch-action:none;';
  wrap.insertBefore(canvas,wrap.firstChild);
- const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+ let renderer;
+ try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});}
+ catch(err){arenaSay('3D tidak dapat dijalankan di browser ini. Aktifkan akselerasi grafis/WebGL atau buka dengan Chrome terbaru. Detail: '+err.message);throw err;}
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -242,6 +244,7 @@ function spawnBurst(x,z,color,big=false){
  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.75,wireframe:true});
  const m=new THREE.Mesh(geo,mat);m.position.set(x,.8,z);arena.scene.add(m);arena.effectMeshes.push({mesh:m,life:big?1.05:.65,max:big?1.05:.65});
 }
+function wrapWidth(){const el=$('arenaWrap');return el?el.clientWidth:640;}
 function render3D(dt){
  if(!arena.renderer||!arena.scene)return;
  animateFighter(arena.hero,arena.player,dt);animateFighter(arena.enemy,arena.bot,dt);
@@ -251,7 +254,8 @@ function render3D(dt){
  arena.hero.root.position.set(p.x,0,p.z);arena.enemy.root.position.set(b.x,0,b.z);
  arena.hero.root.rotation.y=p.dir;arena.enemy.root.rotation.y=Math.atan2(p.x-b.x,p.z-b.z);
  const target=new THREE.Vector3(p.x,0,p.z);
- const desired=new THREE.Vector3(p.x,p.z+0,0); // camera follows player from behind
+ const w=Math.max(320,wrapWidth()), h=Math.max(280,Math.min(540,Math.round(w*.58)));
+ if(arena.renderer.domElement.width!==Math.round(w*Math.min(window.devicePixelRatio||1,1.5))||arena.renderer.domElement.height!==Math.round(h*Math.min(window.devicePixelRatio||1,1.5))){arena.renderer.setSize(w,h,false);arena.camera.aspect=w/h;arena.camera.updateProjectionMatrix();}
  arena.camera.position.lerp(new THREE.Vector3(p.x,11,p.z+13),.08);
  arena.camera.lookAt(target.x,0.7,target.z);
  arena.renderer.render(arena.scene,arena.camera);
@@ -264,7 +268,9 @@ function updateHud(){
  $('ultBtn').textContent=arena.cooldown.ult>0?'Ultimate ('+Math.ceil(arena.cooldown.ult)+')':'✦ Ultimate';
 }
 function startArena(){
- if(!arena.renderer)init3D();
+ const wrap=$('arenaWrap');
+ if(!wrap||!$('arenaPage')||$('arenaPage').hidden)return;
+ if(!arena.renderer){try{init3D();}catch(err){console.error('ASTRAVION 3D init gagal:',err);return;}}
  arena.running=true;arena.last=0;
  if(arena.raf)cancelAnimationFrame(arena.raf);
  arenaSay('Arena 3D dimulai! Gerakkan hero dengan joystick. Dekati musuh lalu gunakan serangan dan skill.');
@@ -284,7 +290,7 @@ function arenaLoop(t){
  const bx=p.x-b.x,bz=p.z-b.z,dist=Math.hypot(bx,bz)||1;
  b.walk=dist>1.55?1:0;
  if(dist>1.55){b.x+=bx/dist*2.05*dt;b.z+=bz/dist*2.05*dt;}
- else if(Math.random()<dt*.8){p.hp=Math.max(0,p.hp-4);p.flash=.18;spawnBurst(p.x,p.z,0xff4444);}
+ else if(Math.random()<dt*.8){p.hp=Math.max(0,p.hp-4);p.flash=.18;if(arena.enemy)arena.enemy.attack=.42;spawnBurst(p.x,p.z,0xff4444);}
  Object.keys(arena.cooldown).forEach(k=>arena.cooldown[k]=Math.max(0,arena.cooldown[k]-dt));
  if(b.hp<=0){arenaSay('MENANG! Musuh berhasil dikalahkan. Tekan Ulangi Pertarungan untuk bermain lagi.');arena.running=false;}
  if(p.hp<=0){arenaSay('Hero tumbang. Tekan Ulangi Pertarungan untuk mencoba lagi.');arena.running=false;}
@@ -341,7 +347,7 @@ $('ultBtn').addEventListener('click',()=>useSkill('ult'));
 $('musicBtn').addEventListener('click',toggleMusic);
 $('voiceBtn').addEventListener('click',()=>speakHero('Aku siap bertarung!'));
 $('resetArena').addEventListener('click',resetArena);
-document.querySelectorAll('[data-page="arenaPage"]').forEach(btn=>btn.addEventListener('click',startArena));
+document.querySelectorAll('[data-page="arenaPage"]').forEach(btn=>btn.addEventListener('click',()=>{showPage('arenaPage');}));
 window.addEventListener('keydown',e=>{arena.keys[e.key]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();});
 window.addEventListener('keyup',e=>{arena.keys[e.key]=false;});
 const joyBase=$('joyBase'),joyKnob=$('joyKnob');
