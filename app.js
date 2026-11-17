@@ -118,7 +118,7 @@ document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',(
 function renderAllSkins(){ $('allSkins').innerHTML=heroes.flatMap(h=>h.skins.map((s,i)=>`<article class="skin-tile"><img src="${ART[h.id][i]}" alt="${s}"><h3>${s}</h3><p>${h.name} · ${h.title}</p><button data-openhero="${h.id}" data-openskin="${i}">Lihat Skin</button></article>`)).join('');document.querySelectorAll('[data-openhero]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.openhero;selectedSkin=Number(b.dataset.openskin);render();showPage('heroPage');})); }
 $('buyHero').addEventListener('click',()=>{const h=current();if(owned.includes(h.id)){say(h.name+' sudah dimiliki.');return;}let coins=Number(localStorage.getItem('astravionCoins')||32000);if(coins<h.price){say('Coin tidak cukup.');return;}coins-=h.price;localStorage.setItem('astravionCoins',coins);owned.push(h.id);localStorage.setItem('astravionOwnedHeroes',JSON.stringify(owned));render();say(h.name+' berhasil dibeli (tersimpan di browser ini).');});
 $('previewHero').addEventListener('click',()=>say('Preview: '+current().name+' — '+current().skins[selectedSkin]));
-$('tryHero').addEventListener('click',()=>say('Mode coba hero akan dihubungkan ke arena pada tahap berikutnya.'));
+$('tryHero').addEventListener('click',()=>{resetArena();showPage('arenaPage');arenaSay('Mode coba dimulai! Gerakkan hero dengan joystick atau WASD, lalu serang bot.');});
 $('logout').addEventListener('click',()=>signOut(auth));
 $('login').addEventListener('click',async()=>{try{await signInWithEmailAndPassword(auth,$('email').value,$('password').value);}catch(e){$('authMessage').textContent='Login gagal: '+e.message;}});
 $('register').addEventListener('click',async()=>{try{await createUserWithEmailAndPassword(auth,$('email').value,$('password').value);}catch(e){$('authMessage').textContent='Daftar gagal: '+e.message;}});
@@ -145,6 +145,7 @@ function startArena(){
  arena.running=true; arena.last=0;
  if(arena.raf) cancelAnimationFrame(arena.raf);
  arenaSay('Pertarungan dimulai! Gerakkan hero dan kalahkan bot.');
+ drawArena(); updateHud();
  arena.raf=requestAnimationFrame(arenaLoop);
 }
 function stopArena(){arena.running=false;if(arena.raf)cancelAnimationFrame(arena.raf);}
